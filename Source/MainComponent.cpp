@@ -40,10 +40,10 @@ void MainContentComponent::paint (Graphics& g)
 	int bottom = getHeight() - 20;
 
 	if (floatArr.size() > 0) {
-		for (int i = 0; i < floatArr.size(); i++) {
-			float x = (getWidth() - 40) * (double)i / (double)floatArr.size();
+		for (int i = 1; i < floatArr.size() + 1; i++) {
+			float x = (getWidth() - 40) * (double) i / ((double)floatArr.size() + 2) + 20;
 			g.setColour(Colours::red);
-			float h = hBase * (floatArr[i] / max);
+			float h = hBase * (floatArr[i - 1] / max);
 			g.drawLine(x, bottom, x, bottom - h);
 		}
 	}

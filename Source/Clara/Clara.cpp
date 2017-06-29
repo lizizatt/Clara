@@ -140,7 +140,7 @@ void Clara::run()
 				for (int i = 0; i < stride; i++) {
 					int sample = intSamples[c][i];
 					float ceil = pow(2, reader->bitsPerSample);
-					float val = (float)sample / ceil;
+					float val = (float)sample / ceil / reader->sampleRate;
 					samples[c][i] = val;
 
 					if (c == 0) {
@@ -182,7 +182,7 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 {
 	ScopedLock lock(audioBufferSection);
 	for (int i = 0; i < outputBuffer.buffer->getNumChannels(); i++) {
-		float* typePointer = &samples[0][outputBuffer.startSample];
+		float* typePointer = &samples[i][outputBuffer.startSample];
 		outputBuffer.buffer->copyFrom(i, outputBuffer.startSample, typePointer, outputBuffer.numSamples);
 	}
 }
