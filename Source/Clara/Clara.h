@@ -16,8 +16,14 @@
 //==============================================================================
 /*
 */
+
+
 class Clara : public Thread, public AudioSource
 {
+public:
+	static const double tick_seconds ;
+	static const int LOOKBACK_LIMIT;
+
 public:
     Clara();
     ~Clara();
@@ -47,6 +53,7 @@ public:
 	public:
 		virtual int getIntOutput() { return output; }
 		int output = 0;
+		Array<int> previousValues;
 	};
 
 	class IntSumNode : public Node, public IntOutput
@@ -61,6 +68,7 @@ public:
 	public:
 		virtual float getFloatOutput() { return output; }
 		float output = 0.0f;
+		Array<int> previousValues;
 	};
 
 	class FloatSumNode : public Node, public FloatOutput
@@ -80,6 +88,7 @@ public:
 	public:
 		double frequency;
 		Array<int> audioBuffer;
+		Array<int> previousAudio;
 	};
 
 public:
@@ -88,6 +97,7 @@ public:
 public:
 	void setUpNodes();
 	void run() override;
+	void runNodeOutputs();
 
 	void prepareToPlay(int smaples, double rate) {}
 	void releaseResources() {}

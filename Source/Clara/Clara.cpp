@@ -11,6 +11,9 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "Clara.h"
 
+const double Clara::tick_seconds = 0.1;
+const int Clara::LOOKBACK_LIMIT = 10;
+
 //==============================================================================
 Clara::Clara()
 	: Thread("Clara")
@@ -21,49 +24,6 @@ Clara::~Clara()
 {
 }
 
-Clara::Node::Node()
-{
-	allNodes.add(this);
-}
-
-void Clara::Node::baseTick()
-{
-	tickCount++;
-	tick();
-}
-
-void Clara::Node::runAllNodes()
-{
-	for (int i = 0; i < allNodes.size(); i++) {
-		allNodes[i]->baseTick();
-	}
-}
-
-void Clara::AudioFrequencySourceNode::tick()
-{
-	if (audioBuffer.size() > 0) {
-		output = audioBuffer[0];
-		audioBuffer.remove(0);
-	}
-}
-
-void Clara::IntSumNode::tick()
-{
-	output = 0;
-	for (int i = 0; i < inputNodes.size(); i++) {
-		output += inputNodes[i]->getIntOutput();
-	}
-}
-
-void Clara::FloatSumNode::tick()
-{
-	output = 0;
-	for (int i = 0; i < inputNodes.size(); i++) {
-		output += inputNodes[i]->getFloatOutput();
-	}
-}
-
-Array<Clara::Node*> Clara::Node::allNodes;
 void Clara::setUpNodes()
 {
 	audioSumNode = new FloatSumNode();
@@ -109,7 +69,6 @@ void Clara::run()
 
 	int nToRun = 10000;
 	double length = (double) reader->lengthInSamples / (double) reader->sampleRate;
-	double timeStep = (double) stepRate / (double) reader->sampleRate;
 	Time start = Time::getCurrentTime();
 	Time lastCheck = start;
 
@@ -163,19 +122,48 @@ void Clara::run()
 				}
 			}
 		}
-	
 
 		//run nodes if it's time
-		if ((Time::getCurrentTime() - lastCheck).inSeconds() > timeStep) {
+		if ((Time::getCurrentTime() - lastCheck).inSeconds() > tick_seconds) {
 			lastCheck = Time::getCurrentTime();
 			Node::runAllNodes();
-			excitementBuffer.add(audioSumNode->output);
+
+			runNodeOutputs();
 			if (excitementBuffer.size() > 100) {
 				excitementBuffer.remove(0);
 			}
 		}
 		wait(5);
 	}
+
+	delete intSamples;
+	delete samples;
+}
+
+void Clara::runNodeOutputs()
+{
+	//excitement, based on audio
+	int excitementLookBack = LOOKBACK_LIMIT;
+	float oldExcitementWeight = .5;
+	float oldExcitementSum = 0;
+	for (int i = fmax(0, excitementBuffer.size() - excitementLookBack - 1); i < excitementBuffer.size(); i++) {
+		oldExcitementSum += excitementBuffer[i];
+	}
+	float newExcitementValue = audioSumNode->output;
+	
+	//adding velocity estimate
+	if (audioSumNode->previousValues.size() > 1) {
+		float excitementVelocity = 0;
+		float prev = audioSumNode->previousValues[audioSumNode->previousValues.size()];
+		for (int i = audioSumNode->previousValues.size() - 2; i >= 0; i--) {
+			excitementVelocity += prev - audioSumNode->previousValues[i];
+		}
+		excitementVelocity /= audioSumNode->previousValues.size();
+		newExcitementValue += excitementVelocity * .25;
+	}
+
+	newExcitementValue = newExcitementValue * (1.0 - oldExcitementWeight) + oldExcitementWeight * oldExcitementSum / excitementLookBack;
+	excitementBuffer.add(newExcitementValue);
 }
 
 void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)

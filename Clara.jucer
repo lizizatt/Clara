@@ -7,6 +7,7 @@
     <GROUP id="{B231F948-18F0-E7FC-3961-59E8DE62BE53}" name="Clara">
       <FILE id="sdVjfL" name="Clara.cpp" compile="1" resource="0" file="Source/Clara/Clara.cpp"/>
       <FILE id="xiAV5T" name="Clara.h" compile="0" resource="0" file="Source/Clara/Clara.h"/>
+      <FILE id="Qz9HxS" name="ClaraNodes.cpp" compile="1" resource="0" file="Source/Clara/ClaraNodes.cpp"/>
     </GROUP>
     <GROUP id="{28307E5F-D034-757B-7777-567BD5E5616D}" name="Source">
       <FILE id="OrkTYL" name="MainComponent.cpp" compile="1" resource="0"

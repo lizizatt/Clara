@@ -361,6 +361,9 @@
     <ClCompile Include="..\..\Source\Clara\Clara.cpp">
       <Filter>Clara\Clara</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Clara\ClaraNodes.cpp">
+      <Filter>Clara\Clara</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>Clara\Source</Filter>
     </ClCompile>
