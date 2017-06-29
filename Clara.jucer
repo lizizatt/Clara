@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="NwlFCC" name="Clara" projectType="guiapp" version="1.0.0"
+              bundleIdentifier="com.yourcompany.Clara" includeBinaryInAppConfig="1"
+              jucerVersion="4.3.0">
+  <MAINGROUP id="Ks9deu" name="Clara">
+    <GROUP id="{B231F948-18F0-E7FC-3961-59E8DE62BE53}" name="Clara">
+      <FILE id="sdVjfL" name="Clara.cpp" compile="1" resource="0" file="Source/Clara/Clara.cpp"/>
+      <FILE id="xiAV5T" name="Clara.h" compile="0" resource="0" file="Source/Clara/Clara.h"/>
+    </GROUP>
+    <GROUP id="{28307E5F-D034-757B-7777-567BD5E5616D}" name="Source">
+      <FILE id="OrkTYL" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+      <FILE id="agrxcq" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="h7JLf2" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    </GROUP>
+    <GROUP id="{68E37EFD-7462-583B-3F25-33DF07960960}" name="Resources"/>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <VS2015 targetFolder="Builds/VisualStudio2015">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Clara"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="Clara"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:/Users/Liz/Desktop/Heptapod Translator/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2015>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
+  </MODULES>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>

@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2015
+Project("{20B55237-DB18-5AC9-5A2C-B6CE23807D09}") = "Clara", "Clara.vcxproj", "{3D41EA78-ECCB-7334-9A43-895AFFCA911A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D41EA78-ECCB-7334-9A43-895AFFCA911A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D41EA78-ECCB-7334-9A43-895AFFCA911A}.Debug|Win32.Build.0 = Debug|Win32
+		{3D41EA78-ECCB-7334-9A43-895AFFCA911A}.Release|Win32.ActiveCfg = Release|Win32
+		{3D41EA78-ECCB-7334-9A43-895AFFCA911A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
