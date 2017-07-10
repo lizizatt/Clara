@@ -29,8 +29,10 @@ void Clara::setUpNodes()
 	audioSumNode = new FloatSumNode();
 	nodes.add(audioSumNode);
 
-	for (int i = 400; i < 20000; i *= 1.25) {
-		AudioFrequencySourceNode *audNode = new AudioFrequencySourceNode((double) i);
+    Array<float> frequencies = {16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87};
+    
+    for (int i = 0; i < frequencies.size(); i++) {
+		AudioFrequencySourceNode *audNode = new AudioFrequencySourceNode(frequencies[i]);
 		audioSumNode->inputNodes.add(audNode);
 		earNodes.add(audNode);
 		nodes.add(audNode);
@@ -40,7 +42,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("L:/Clara/Resources/repost.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/repost.mp3"));
 	AudioFormatManager formatManager;
 
 	formatManager.registerBasicFormats();
@@ -71,17 +73,7 @@ void Clara::run()
 	double length = (double) reader->lengthInSamples / (double) reader->sampleRate;
 	Time start = Time::getCurrentTime();
 	Time lastCheck = start;
-
-	AudioDeviceManager manager;
-	manager.initialiseWithDefaultDevices(0, reader->numChannels);
-	AudioIODevice *device = manager.getCurrentAudioDevice();
-	device->open(0, reader->numChannels, reader->sampleRate, stepRate);
-
-	AudioSourcePlayer player;
-	player.setSource(this);
-
-	device->start(&player);
-
+    
 	//run
 	DBG("Running");
 	for (int i = 0; i < nToRun && !threadShouldExit(); i++) {
@@ -114,12 +106,20 @@ void Clara::run()
 			//pass to audio nodes
 			double peakFrequency = 512 * reader->sampleRate / (float) stepRate;
 			for (int i = 0; i < earNodes.size(); i++) {
+                //each ear node represents a base frequency
+                //we want to fill it with the sum of the base frequency and all harmonics up to max frequency
+                double toAdd = 0;
 				double freq = earNodes[i]->frequency;
-				int pos = (freq / peakFrequency) * 1024;
-				if (pos >= 0 && pos < stepRate)
-				{
-					earNodes[i]->audioBuffer.add(sqrt(pow(outputFromFFT[i].r, 2) + pow(outputFromFFT[i].i, 2)));
-				}
+                while (freq < peakFrequency) {
+                    int pos = (freq / peakFrequency) * stepRate;
+                    if (pos >= 0 && pos < stepRate)
+                    {
+                        toAdd += sqrt(pow(outputFromFFT[pos].r, 2) + pow(outputFromFFT[pos].i, 2)) * 1000.0;
+                        //DBG(String::formatted("Added value %f for base frequency %f, harmonic %f", toAdd, earNodes[i]->frequency, freq));
+                    }
+                    freq = freq * 2;
+                }
+                earNodes[i]->audioBuffer.add(toAdd);
 			}
 		}
 
@@ -150,17 +150,6 @@ void Clara::runNodeOutputs()
 		oldExcitementSum += excitementBuffer[i];
 	}
 	float newExcitementValue = audioSumNode->output;
-	
-	//adding velocity estimate
-	if (audioSumNode->previousValues.size() > 1) {
-		float excitementVelocity = 0;
-		float prev = audioSumNode->previousValues[audioSumNode->previousValues.size()];
-		for (int i = audioSumNode->previousValues.size() - 2; i >= 0; i--) {
-			excitementVelocity += prev - audioSumNode->previousValues[i];
-		}
-		excitementVelocity /= audioSumNode->previousValues.size();
-		newExcitementValue += excitementVelocity * .25;
-	}
 
 	newExcitementValue = newExcitementValue * (1.0 - oldExcitementWeight) + oldExcitementWeight * oldExcitementSum / excitementLookBack;
 	excitementBuffer.add(newExcitementValue);

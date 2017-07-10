@@ -31,7 +31,7 @@ void MainContentComponent::paint (Graphics& g)
 
 	g.drawRect(20, 20, getWidth() - 40, getHeight() - 40);
 	
-	float max = 1;
+    float max = -10000;
 	for (int i = 0; i < floatArr.size(); i++) {
 		max = floatArr[i] > max ? floatArr[i] : max;
 	}
