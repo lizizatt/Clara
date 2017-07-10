@@ -15,10 +15,13 @@ MainContentComponent::MainContentComponent(Clara *clara)
 {
     setSize (600, 400);
 	startTimer(100);
+    
+    setAudioChannels(0, 1);
 }
 
 MainContentComponent::~MainContentComponent()
 {
+    shutdownAudio();
 	stopTimer();
 }
 
@@ -57,4 +60,9 @@ void MainContentComponent::resized()
 void MainContentComponent::timerCallback()
 {
 	repaint();
+}
+
+void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo &buffer)
+{
+    clara->getNextAudioBlock(buffer);
 }

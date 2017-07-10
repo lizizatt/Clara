@@ -43,9 +43,9 @@ void Clara::run()
 {
 	DBG("Loading file");
 	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/repost.mp3"));
-	AudioFormatManager formatManager;
 
-	formatManager.registerBasicFormats();
+    AudioFormatManager formatManager;
+    formatManager.registerBasicFormats();
 	ScopedPointer<AudioFormatReader> reader = formatManager.createReaderFor(stream);
 
 	//setup
@@ -81,6 +81,7 @@ void Clara::run()
 		long currentPtsCap = fmin((Time::getCurrentTime() - start).inSeconds() * reader->sampleRate, reader->lengthInSamples) + reader->sampleRate;
 		while (pts < currentPtsCap) {
 			ScopedLock lock(audioBufferSection);
+            readyToPlayAudio = true;
 			int stride = fmin(stepRate, reader->lengthInSamples - pts);
 			bool res = reader->read(intSamples, reader->numChannels, pts, stride, false);
 			jassert(res);
@@ -91,13 +92,14 @@ void Clara::run()
 				for (int i = 0; i < stride; i++) {
 					int sample = intSamples[c][i];
 					float ceil = pow(2, reader->bitsPerSample);
-					float val = (float)sample / ceil / reader->sampleRate;
+					float val = (float) sample / ceil / reader->sampleRate;
 					samples[c][i] = val;
 
 					if (c == 0) {
-						inputToFFT[i].r = val;
+						inputToFFT[i].r = 0;
 						inputToFFT[i].i = 0;
 					}
+                    inputToFFT[i].r += val;
 				}
 			}
 
@@ -114,7 +116,7 @@ void Clara::run()
                     int pos = (freq / peakFrequency) * stepRate;
                     if (pos >= 0 && pos < stepRate)
                     {
-                        toAdd += sqrt(pow(outputFromFFT[pos].r, 2) + pow(outputFromFFT[pos].i, 2)) * 1000.0;
+                        toAdd += sqrt(pow(outputFromFFT[pos].r, 2) + pow(outputFromFFT[pos].i, 2));
                         //DBG(String::formatted("Added value %f for base frequency %f, harmonic %f", toAdd, earNodes[i]->frequency, freq));
                     }
                     freq = freq * 2;
@@ -135,6 +137,7 @@ void Clara::run()
 		}
 		wait(5);
 	}
+    readyToPlayAudio = false;
 
 	delete intSamples;
 	delete samples;
@@ -158,8 +161,16 @@ void Clara::runNodeOutputs()
 void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 {
 	ScopedLock lock(audioBufferSection);
-	for (int i = 0; i < outputBuffer.buffer->getNumChannels(); i++) {
-		float* typePointer = &samples[i][outputBuffer.startSample];
+    
+    /*
+    for (int c = 0; readyToPlayAudio && c < outputBuffer.buffer->getNumChannels(); c++) {
+        for (int s = outputBuffer.startSample; s < outputBuffer.startSample + outputBuffer.numSamples; s++) {
+            outputBuffer.buffer->setSample(c, s, samples[c][s]);
+        }
+    }
+    */
+	for (int i = 0; readyToPlayAudio && i < outputBuffer.buffer->getNumChannels(); i++) {
+        float* typePointer = &(samples[i][outputBuffer.startSample]);
 		outputBuffer.buffer->copyFrom(i, outputBuffer.startSample, typePointer, outputBuffer.numSamples);
 	}
 }

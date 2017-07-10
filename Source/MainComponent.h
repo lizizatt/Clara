@@ -18,7 +18,7 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainContentComponent   : public Component, public Timer
+class MainContentComponent   : public AudioAppComponent, public Timer
 {
 public:
     //==============================================================================
@@ -27,6 +27,10 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+    
+    void prepareToPlay(int samplesPerBlock, double sampleRate) override {};
+    void releaseResources() override {};
+    void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
 
 	void timerCallback() override;
 

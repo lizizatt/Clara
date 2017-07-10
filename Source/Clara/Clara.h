@@ -18,7 +18,7 @@
 */
 
 
-class Clara : public Thread, public AudioSource
+class Clara : public Thread
 {
 public:
 	static const double tick_seconds ;
@@ -99,8 +99,6 @@ public:
 	void run() override;
 	void runNodeOutputs();
 
-	void prepareToPlay(int smaples, double rate) {}
-	void releaseResources() {}
 	void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
 
 private:
@@ -112,6 +110,7 @@ private:
 	int numSamples;
 	int nChannels;
 	CriticalSection audioBufferSection;
+    bool readyToPlayAudio = false;
 
 	Array<float> excitementBuffer;
 };
