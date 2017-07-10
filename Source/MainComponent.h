@@ -28,7 +28,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    void prepareToPlay(int samplesPerBlock, double sampleRate) override {};
+    void prepareToPlay(int samplesPerBlock, double sampleRate) override;
     void releaseResources() override {};
     void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
 

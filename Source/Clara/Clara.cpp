@@ -54,17 +54,10 @@ void Clara::run()
 	nChannels = reader->numChannels;
 	int stepRate = 1024;
 	long pts = 0;
-	int size = stepRate * reader->bitsPerSample;
-	samples = (float**) malloc(reader->numChannels * sizeof(float*));
-	for (int i = 0; i < reader->numChannels; i++) {
-		samples[i] = (float*) malloc(size);
-	}
-	int** intSamples = (int**)malloc(reader->numChannels * sizeof(int*));
-	for (int i = 0; i < reader->numChannels; i++) {
-		intSamples[i] = (int*)malloc(size);
-	}
+    
+    myBuffer = new AudioSampleBuffer(nChannels, stepRate);
+    myBuffer->clear();
 
-	DBG(String::formatted("Alloced %d bytes", size));
 	FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * stepRate);
 	FFT::Complex* outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * stepRate);
 	FFT fft(10, false);
@@ -83,23 +76,18 @@ void Clara::run()
 			ScopedLock lock(audioBufferSection);
             readyToPlayAudio = true;
 			int stride = fmin(stepRate, reader->lengthInSamples - pts);
-			bool res = reader->read(intSamples, reader->numChannels, pts, stride, false);
-			jassert(res);
+            myBuffer->clear();
+			reader->read(myBuffer, 0, stride, pts, false, false);
 			pts += stride;
-			numSamples = stride;
-
+            numSamples = stride;
+            
 			for (int c = 0; c < reader->numChannels; c++) {
 				for (int i = 0; i < stride; i++) {
-					int sample = intSamples[c][i];
-					float ceil = pow(2, reader->bitsPerSample);
-					float val = (float) sample / ceil / reader->sampleRate;
-					samples[c][i] = val;
-
 					if (c == 0) {
 						inputToFFT[i].r = 0;
 						inputToFFT[i].i = 0;
 					}
-                    inputToFFT[i].r += val;
+                    inputToFFT[i].r += myBuffer->getSample(c, i);
 				}
 			}
 
@@ -139,7 +127,6 @@ void Clara::run()
 	}
     readyToPlayAudio = false;
 
-	delete intSamples;
 	delete samples;
 }
 
@@ -162,17 +149,17 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 {
 	ScopedLock lock(audioBufferSection);
     
-    /*
     for (int c = 0; readyToPlayAudio && c < outputBuffer.buffer->getNumChannels(); c++) {
         for (int s = outputBuffer.startSample; s < outputBuffer.startSample + outputBuffer.numSamples; s++) {
-            outputBuffer.buffer->setSample(c, s, samples[c][s]);
+            outputBuffer.buffer->setSample(c, s, myBuffer->getSample(c, s));
         }
     }
-    */
+     /*
 	for (int i = 0; readyToPlayAudio && i < outputBuffer.buffer->getNumChannels(); i++) {
         float* typePointer = &(samples[i][outputBuffer.startSample]);
 		outputBuffer.buffer->copyFrom(i, outputBuffer.startSample, typePointer, outputBuffer.numSamples);
 	}
+     */
 }
 
 Array<float> Clara::getExcitementBuffer()

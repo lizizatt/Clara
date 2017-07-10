@@ -111,7 +111,8 @@ private:
 	int nChannels;
 	CriticalSection audioBufferSection;
     bool readyToPlayAudio = false;
-
+    ScopedPointer<AudioSampleBuffer> myBuffer;
+    
 	Array<float> excitementBuffer;
 };
 

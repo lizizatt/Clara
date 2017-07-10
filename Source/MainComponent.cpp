@@ -16,7 +16,7 @@ MainContentComponent::MainContentComponent(Clara *clara)
     setSize (600, 400);
 	startTimer(100);
     
-    setAudioChannels(0, 1);
+    setAudioChannels(0, 2);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -60,6 +60,11 @@ void MainContentComponent::resized()
 void MainContentComponent::timerCallback()
 {
 	repaint();
+}
+
+void MainContentComponent::prepareToPlay(int samplesPerBlock, double sampleRate)
+{
+    DBG(String::formatted("Preparing to play, %d samples per block, sample rate %f", samplesPerBlock, sampleRate));
 }
 
 void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo &buffer)
