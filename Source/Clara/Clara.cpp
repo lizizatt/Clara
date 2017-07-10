@@ -150,16 +150,8 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 	ScopedLock lock(audioBufferSection);
     
     for (int c = 0; readyToPlayAudio && c < outputBuffer.buffer->getNumChannels(); c++) {
-        for (int s = outputBuffer.startSample; s < outputBuffer.startSample + outputBuffer.numSamples; s++) {
-            outputBuffer.buffer->setSample(c, s, myBuffer->getSample(c, s));
-        }
+        outputBuffer.buffer->copyFrom(c, outputBuffer.startSample, *myBuffer, c, outputBuffer.startSample, outputBuffer.numSamples);
     }
-     /*
-	for (int i = 0; readyToPlayAudio && i < outputBuffer.buffer->getNumChannels(); i++) {
-        float* typePointer = &(samples[i][outputBuffer.startSample]);
-		outputBuffer.buffer->copyFrom(i, outputBuffer.startSample, typePointer, outputBuffer.numSamples);
-	}
-     */
 }
 
 Array<float> Clara::getExcitementBuffer()
