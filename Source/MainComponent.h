@@ -12,6 +12,9 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Clara/Clara.h"
 
+#include "IntervalScoreComponent.h"
+#include "LoudnessComponent.h"
+#include "EmotionsComponent.h"
 
 //==============================================================================
 /*
@@ -35,6 +38,10 @@ public:
 	void timerCallback() override;
 
 private:
+    ScopedPointer<IntervalScoreComponent> intervalScoreComponent;
+    ScopedPointer<LoudnessComponent> loudnessComponent;
+    ScopedPointer<EmotionsComponent> emotionsComponent;
+    
 	Clara *clara = nullptr;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)

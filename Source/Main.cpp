@@ -11,7 +11,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "Clara/Clara.h"
-
 //==============================================================================
 class ClaraApplication  : public JUCEApplication
 {

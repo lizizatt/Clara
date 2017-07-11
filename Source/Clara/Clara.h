@@ -12,13 +12,19 @@
 #define CLARA_H_INCLUDED
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "JauntMessageListenerList.h"
+
+#ifndef MAX_LOOKBACK
+#define MAX_LOOKBACK 50
+#endif
+
 
 //==============================================================================
 /*
 */
 
 
-class Clara : public Thread
+class Clara : public Thread, public MessageListenerList
 {
 public:
 	static const double tick_seconds ;
@@ -41,54 +47,48 @@ public:
 		void baseTick();
 
 	public:
-		static void runAllNodes();
-
+        static void runAllNodes();
 	public:
 		static Array<Node*> allNodes;
 		long tickCount = 0;
 	};
-
-	class IntOutput
+    
+    class LoudnessMetric : public Node
+    {
+    public:
+        class LoudnessMetricOutput : public Message {
+        public:
+            float loudness;
+            LoudnessMetricOutput(float loudness) : loudness(loudness) {}
+        };
+    public:
+        LoudnessMetric(Clara* clara, AudioSampleBuffer *buffer) : clara(clara), buffer(buffer) {}
+        void tick() override;
+    public: //input
+        AudioSampleBuffer *buffer;
+        Clara* clara = nullptr;
+    public: //output
+        float loudness = 0;
+    };
+    
+	class IntervalGenerator : public Node
 	{
-	public:
-		virtual int getIntOutput() { return output; }
-		int output = 0;
-		Array<int> previousValues;
-	};
-
-	class IntSumNode : public Node, public IntOutput
-	{
-	public:
+    public:
+        class IntervalGeneratorOutput : public Message {
+        public:
+            Array<float> intervals;
+            Array<float> intervalPresenceWeights;
+            IntervalGeneratorOutput(Array<float> intervals, Array<float> intervalPresenceWeights) : intervals(intervals), intervalPresenceWeights(intervalPresenceWeights) {}
+        };
+    public:
+        IntervalGenerator(Clara* clara, AudioSampleBuffer *buffer) : clara(clara), buffer(buffer) {}
 		void tick() override;
-		Array<IntOutput*> inputNodes;
-	};
-
-	class FloatOutput
-	{
-	public:
-		virtual float getFloatOutput() { return output; }
-		float output = 0.0f;
-		Array<int> previousValues;
-	};
-
-	class FloatSumNode : public Node, public FloatOutput
-	{
-	public:
-		void tick() override;
-		Array<FloatOutput*> inputNodes;
-	};
-
-	class AudioFrequencySourceNode : public Node, public FloatOutput
-	{
-	public:
-		class Song;
-	public:
-		AudioFrequencySourceNode(double frequency) : frequency(frequency) {}
-		void tick() override;
-	public:
-		double frequency;
-		Array<int> audioBuffer;
-		Array<int> previousAudio;
+    public: //input
+        AudioSampleBuffer *buffer;
+        Clara* clara = nullptr;
+    public: //output
+        Array<float> intervals;
+        Array<float> intervalPresenceWeights;
 	};
 
 public:
@@ -102,13 +102,13 @@ public:
 	void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
 
 private:
-	Array<AudioFrequencySourceNode*> earNodes;
-	OwnedArray<Node> nodes;
-	FloatSumNode* audioSumNode;
-
+    ScopedPointer<LoudnessMetric> loudnessMetricNode;
+    ScopedPointer<IntervalGenerator> intervalGeneratorNode;
+    
 	float **samples;
 	int numSamples;
 	int nChannels;
+    float sampleRate;
 	CriticalSection audioBufferSection;
     bool readyToPlayAudio = false;
     ScopedPointer<AudioSampleBuffer> myBuffer;

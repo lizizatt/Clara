@@ -13,10 +13,14 @@
 MainContentComponent::MainContentComponent(Clara *clara)
 	: clara(clara)
 {
-    setSize (600, 400);
 	startTimer(100);
     
     setAudioChannels(0, 2);
+    
+    addAndMakeVisible(intervalScoreComponent = new IntervalScoreComponent(clara));
+    addAndMakeVisible(loudnessComponent = new LoudnessComponent(clara));
+    addAndMakeVisible(emotionsComponent = new EmotionsComponent(clara));
+    setSize (1200, 800);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -27,34 +31,14 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::paint (Graphics& g)
 {
-	Array<float> floatArr = clara->getExcitementBuffer();
-
-	g.fillAll(Colours::darkgrey);
-	g.setColour(Colours::grey);
-
-	g.drawRect(20, 20, getWidth() - 40, getHeight() - 40);
-	
-    float max = -10000;
-	for (int i = 0; i < floatArr.size(); i++) {
-		max = floatArr[i] > max ? floatArr[i] : max;
-	}
-
-	float hBase = getHeight() - 40;
-	int bottom = getHeight() - 20;
-
-	if (floatArr.size() > 0) {
-		for (int i = 1; i < floatArr.size() + 1; i++) {
-			float x = (getWidth() - 40) * (double) i / ((double)floatArr.size() + 2) + 20;
-			g.setColour(Colours::red);
-			float h = hBase * (floatArr[i - 1] / max);
-			g.drawLine(x, bottom, x, bottom - h);
-		}
-	}
+    g.fillAll(Colours::black);
 }
 
 void MainContentComponent::resized()
 {
-
+    intervalScoreComponent->setBounds(20, 20, getWidth() / 2.0 - 20 - 5, getHeight() / 2.0 - 20 - 5);
+    loudnessComponent->setBounds(20, intervalScoreComponent->getBottom() + 10, getWidth() / 2.0 - 20 - 5, getHeight() / 2.0 - 20 - 5);
+    emotionsComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, getWidth() / 2.0 - 20 - 5, getHeight() - 40);
 }
 
 void MainContentComponent::timerCallback()

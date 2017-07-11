@@ -10,6 +10,22 @@
       <FILE id="Qz9HxS" name="ClaraNodes.cpp" compile="1" resource="0" file="Source/Clara/ClaraNodes.cpp"/>
     </GROUP>
     <GROUP id="{28307E5F-D034-757B-7777-567BD5E5616D}" name="Source">
+      <FILE id="bIZtqh" name="EmotionsComponent.cpp" compile="1" resource="0"
+            file="Source/EmotionsComponent.cpp"/>
+      <FILE id="yiQcvG" name="EmotionsComponent.h" compile="0" resource="0"
+            file="Source/EmotionsComponent.h"/>
+      <FILE id="R1A7IK" name="LoudnessComponent.cpp" compile="1" resource="0"
+            file="Source/LoudnessComponent.cpp"/>
+      <FILE id="jJ0KEU" name="LoudnessComponent.h" compile="0" resource="0"
+            file="Source/LoudnessComponent.h"/>
+      <FILE id="ESHbpe" name="JauntMessageListenerList.cpp" compile="1" resource="0"
+            file="Source/JauntMessageListenerList.cpp"/>
+      <FILE id="GeUTrs" name="JauntMessageListenerList.h" compile="0" resource="0"
+            file="Source/JauntMessageListenerList.h"/>
+      <FILE id="ZxsJWq" name="IntervalScoreComponent.cpp" compile="1" resource="0"
+            file="Source/IntervalScoreComponent.cpp"/>
+      <FILE id="FFL9L3" name="IntervalScoreComponent.h" compile="0" resource="0"
+            file="Source/IntervalScoreComponent.h"/>
       <FILE id="OrkTYL" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
       <FILE id="agrxcq" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
