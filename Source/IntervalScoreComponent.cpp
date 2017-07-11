@@ -43,15 +43,15 @@ void IntervalScoreComponent::paint (Graphics& g)
         int singleChartHeight = (yEnd - yStart) / intervals.size();
         int yPos = singleChartHeight * i + yStart;
         
-        g.drawText(String::formatted("%.3d", intervals[i]), leftSide, yPos + singleChartHeight - 20, 50, 20, Justification::left);
-        
+        g.setColour(Colours::grey);
+        g.drawText(String::formatted("%.2f", intervals[i]), leftSide, yPos + singleChartHeight - 20, 50, 20, Justification::left);
         g.drawLine(leftSide, yPos + singleChartHeight, rightSide, yPos + singleChartHeight);
         
         for (int j = 0; j < prevWeights[i]->size(); j++) {
             int widthStep = (rightSide - leftSide) / prevWeights[i]->size();
             int xPos = leftSide + widthStep * j;
             int h = singleChartHeight * (*prevWeights[i])[j];
-            g.setColour(Colours::green);
+            g.setColour(Colours::cyan);
             g.drawLine(xPos, yPos + singleChartHeight, xPos, yPos + singleChartHeight - fmin(h, singleChartHeight));
         }
     }
@@ -68,7 +68,9 @@ void IntervalScoreComponent::handleMessage(const Message &m)
     Clara::IntervalGenerator::IntervalGeneratorOutput* intervalOut = dynamic_cast<Clara::IntervalGenerator::IntervalGeneratorOutput*>(msg);
     if (intervalOut != nullptr) {
         
-        intervals = intervalOut->intervals;
+        if (intervals.size() == 0) {
+            intervals = intervalOut->intervals;
+        }
         
         for (int i = 0; i < intervalOut->intervalPresenceWeights.size(); i++) {
             if (prevWeights[i]->size() > MAX_LOOKBACK) {

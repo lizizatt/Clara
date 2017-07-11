@@ -12,7 +12,7 @@
 #include "Clara.h"
 
 const double Clara::tick_seconds = 0.1;
-const int Clara::LOOKBACK_LIMIT = 10;
+const int Clara::LOOKBACK_LIMIT = 50;
 
 //==============================================================================
 Clara::Clara()
@@ -41,7 +41,7 @@ void Clara::run()
 
 
 	nChannels = reader->numChannels;
-	int stepRate = 1024;
+	int stepRate = 512;
 	long pts = 0;
     sampleRate = reader->sampleRate;
     

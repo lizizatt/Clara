@@ -40,7 +40,7 @@ void Clara::IntervalGenerator::tick()
     FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * buffer->getNumSamples());
     FFT::Complex* outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * buffer->getNumSamples());
     
-    FFT fft(10, false);
+    FFT fft(9, false);
     
     for (int c = 0; c < buffer->getNumChannels(); c++) {
         for (int i = 0; i < buffer->getNumSamples(); i++) {
@@ -85,7 +85,7 @@ void Clara::IntervalGenerator::tick()
     //now score all intervals from roots
     float maxScore = 0;
     for (int i = 0; i < frequencyCounts.size(); i++) {
-        float interval = frequencies[i] / frequencies[root];
+        float interval = frequencies[(root + i) % frequencyCounts.size()] / frequencies[root];
         intervals.add(interval);
         float weight = frequencyCounts[(root + i) % frequencyCounts.size()];
         intervalPresenceWeights.add(weight);
@@ -94,7 +94,7 @@ void Clara::IntervalGenerator::tick()
     
     //normalize
     for (int i = 0; i < intervalPresenceWeights.size(); i++) {
-        intervalPresenceWeights.set(i, pow(intervalPresenceWeights[i] / maxScore, 2));
+        intervalPresenceWeights.set(i, 1.0 - pow(intervalPresenceWeights[i] / maxScore, 2));
     }
     
     clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights));
