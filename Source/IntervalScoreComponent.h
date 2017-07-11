@@ -36,6 +36,7 @@ private:
     
     OwnedArray<Array<float>> prevWeights;
     Array<float> intervals;
+    int root;
 };
 
 

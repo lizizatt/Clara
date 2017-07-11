@@ -34,6 +34,7 @@ void Clara::IntervalGenerator::tick()
 {
     const Array<float> frequencies = {16.35, 17.32, 18.35, 19.45, 20.60, 21.83, 23.12, 24.5, 25.96, 27.5, 29.14, 30.87};
     
+    
     intervals.clear();
     intervalPresenceWeights.clear();
     
@@ -97,7 +98,7 @@ void Clara::IntervalGenerator::tick()
         intervalPresenceWeights.set(i, 1.0 - pow(intervalPresenceWeights[i] / maxScore, 2));
     }
     
-    clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights));
+    clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights, root));
 
     delete inputToFFT;
     delete outputFromFFT;
@@ -113,7 +114,7 @@ void Clara::LoudnessMetric::tick()
     for (int i = 0; i < buffer->getNumChannels(); i++) {
         for (int j = 0; j < buffer->getNumSamples(); j++) {
             float sample = buffer->getSample(i, j);
-            avgIntensity += sample;
+            avgIntensity += fabs(sample);
             minIntensity = minIntensity > sample? sample : minIntensity;
             maxIntensity = maxIntensity < sample? sample : maxIntensity;
             count++;

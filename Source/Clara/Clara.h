@@ -78,7 +78,8 @@ public:
         public:
             Array<float> intervals;
             Array<float> intervalPresenceWeights;
-            IntervalGeneratorOutput(Array<float> intervals, Array<float> intervalPresenceWeights) : intervals(intervals), intervalPresenceWeights(intervalPresenceWeights) {}
+            int rootIndex;
+            IntervalGeneratorOutput(Array<float> intervals, Array<float> intervalPresenceWeights, int rootIndex) : intervals(intervals), intervalPresenceWeights(intervalPresenceWeights), rootIndex(rootIndex) {}
         };
     public:
         IntervalGenerator(Clara* clara, AudioSampleBuffer *buffer) : clara(clara), buffer(buffer) {}

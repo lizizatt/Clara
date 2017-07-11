@@ -33,7 +33,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/repost.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/bachcello.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -51,13 +51,12 @@ void Clara::run()
     //setup
     setUpNodes();
 
-	int nToRun = 10000;
 	Time start = Time::getCurrentTime();
 	Time lastCheck = start;
     
 	//run
 	DBG("Running");
-    for (int i = 0; i < nToRun && !threadShouldExit(); i++) {
+    for (int i = 0; !threadShouldExit(); i++) {
         
         //grab audio and run nodes to process it
 		long currentPtsCap = fmin((Time::getCurrentTime() - start).inSeconds() * reader->sampleRate, reader->lengthInSamples) + reader->sampleRate;
@@ -79,8 +78,6 @@ void Clara::run()
 		wait(5);
 	}
     readyToPlayAudio = false;
-
-	delete samples;
 }
 
 void Clara::runNodeOutputs()
