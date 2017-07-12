@@ -161,10 +161,6 @@ void Clara::MusicHormoneNode::tick()
     clara->deltaSerotonin += majorWeight;
     clara->deltaDopamine -= minorWeight;
     clara->deltaNoradrenaline += majorWeight * loudness;
-    
-    DBG(String::formatted("Major %f, minor %f, loudness %f", majorWeight, minorWeight, loudness));
-    
-    clara->notifyNeurotransmitters();
 }
 
 Clara::NeurotransmitterManagerNode::NeurotransmitterManagerNode(Clara *clara)
@@ -191,11 +187,28 @@ void Clara::NeurotransmitterManagerNode::tick()
     float diffN = .5 - curN;
     float diffWeight = .1;
     
-    curS += diffWeight * diffS + deltaS;
-    curD += diffWeight * diffD + deltaD;
-    curN += diffWeight * diffN + deltaN;
+    float deltaOverallWeight = .01;
+    float deltaWeightS = fabs(deltaS) / fabs(prevDS) * deltaOverallWeight;
+    float deltaWeightD = fabs(deltaD) / fabs(prevDD) * deltaOverallWeight;
+    float deltaWeightN = fabs(deltaN) / fabs(prevDN) * deltaOverallWeight;
+    
+    curS += diffWeight * diffS + deltaS * deltaWeightS;
+    curD += diffWeight * diffD + deltaD * deltaWeightD;
+    curN += diffWeight * diffN + deltaN * deltaWeightN;
     
     clara->serotoninLevel = fmin(fmax(curS, 0.0), 1.0);
     clara->dopamineLevel = fmin(fmax(curD, 0.0), 1.0);
     clara->noradrenalineLevel = fmin(fmax(curN, 0.0), 1.0);
+    
+    clara->notifyNeurotransmitters();
+    
+    //maintain rolling average of previous delta values
+    float lpfscaler = .95;
+    prevDS = prevDS * lpfscaler + deltaS * (1.0 - lpfscaler);
+    prevDD = prevDD * lpfscaler + deltaD * (1.0 - lpfscaler);
+    prevDN = prevDN * lpfscaler + deltaN * (1.0 - lpfscaler);
+    
+    //DBG(String::formatted("S: %f, %f, %f", clara->serotoninLevel, deltaS, prevDS));
+    //DBG(String::formatted("D: %f, %f, %f", clara->dopamineLevel, deltaD, prevDD));
+    //DBG(String::formatted("N: %f, %f, %f", clara->noradrenalineLevel, deltaN, prevDN));
 }

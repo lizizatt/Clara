@@ -153,6 +153,10 @@ public:
         void tick() override;
     public:
         Clara *clara = nullptr;
+        
+        float prevDS = 0;
+        float prevDD = 0;
+        float prevDN = 0;
     };
     
 public:
