@@ -34,7 +34,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/repost.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/allstarchorale.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();

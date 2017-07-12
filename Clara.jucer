@@ -38,7 +38,9 @@
       <FILE id="agrxcq" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="h7JLf2" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
-    <GROUP id="{68E37EFD-7462-583B-3F25-33DF07960960}" name="Resources"/>
+    <GROUP id="{68E37EFD-7462-583B-3F25-33DF07960960}" name="Resources">
+      <FILE id="Bc5ynC" name="thecube.png" compile="0" resource="1" file="Resources/thecube.png"/>
+    </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
