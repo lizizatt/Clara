@@ -159,6 +159,7 @@ void Clara::MusicHormoneNode::tick()
     }
     
     clara->serotoninLevel += majorWeight * loudness;
+    clara->serotoninLevel -= minorWeight * loudness;
     clara->dopamineLevel += majorWeight * loudness;
     
     clara->notifyNeurotransmitters();
@@ -171,4 +172,48 @@ Clara::EmotionGenerationNode::EmotionGenerationNode(Clara *clara)
 
 void Clara::EmotionGenerationNode::tick()
 {
+    /*
+    float sero = clara->serotoninLevel;
+    float dopa = clara->dopamineLevel;
+    float nora = clara->noradrenalineLevel;
+    
+    float seroCost = .1;
+    float dopaCost = .1;
+    float noraCost = .1;
+    
+    float max = 0;
+    
+    for (int i = 0; i < Emotion::null; i++) {
+        Emotion e = (Emotion) i;
+        float toAdd = 0;
+        switch (e) {
+            case (Emotion::shame): {
+                
+                break;
+            }
+            case (Emotion::distress): {
+                break;
+            }
+            case (Emotion::terror): {
+                break;
+            }
+            case (Emotion::anger): {
+                break;
+            }
+            case (Emotion::disgust): {
+                break;
+            }
+            case (Emotion::surprise): {
+                break;
+            }
+            case (Emotion::joy): {
+                break;
+            }
+            case (Emotion::excitement): {
+                break;
+            }
+        }
+        clara->currentEmotionMap.set(e, clara->currentEmotionMap[e] + toAdd);
+    }
+     */
 }
