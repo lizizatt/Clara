@@ -13,6 +13,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Clara/Clara.h"
+#include "BacklookChart.h"
 
 //==============================================================================
 /*
@@ -30,9 +31,7 @@ public:
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoudnessComponent)
-    float loudness = 0.1;
-    float maxLoudness = 0.1;
-    Array<float> prevLoudness;
+    BacklookChart loudnessChart;
     Clara *clara;
 };
 

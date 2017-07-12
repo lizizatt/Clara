@@ -13,9 +13,10 @@
 
 //==============================================================================
 EmotionsComponent::EmotionsComponent(Clara *clara)
-: clara(clara)
+: clara(clara), happinessChart("Happy / Sad", Colours::green, MAX_LOOKBACK)
 {
     clara->addListener(this);
+    addAndMakeVisible(happinessChart);
 }
 
 EmotionsComponent::~EmotionsComponent()
@@ -25,18 +26,22 @@ EmotionsComponent::~EmotionsComponent()
 
 void EmotionsComponent::paint (Graphics& g)
 {
+    g.setColour(Colours::grey);
+    g.drawRect(0, 0, getWidth(), getHeight(), 1);
+    
 }
 
 void EmotionsComponent::resized()
 {
-
+    happinessChart.setBounds(20, 20, getWidth() - 40, getHeight() - 40);
 }
 
 void EmotionsComponent::handleMessage(const Message &m)
 {
     Message *msg = const_cast<Message*>(&m);
     
-    Clara::IntervalGenerator::IntervalGeneratorOutput* intervalOut = dynamic_cast<Clara::IntervalGenerator::IntervalGeneratorOutput*>(msg);
-    if (intervalOut != nullptr) {
+    Clara::HappinessNode::HappinessNodeOutput* happyOut = dynamic_cast<Clara::HappinessNode::HappinessNodeOutput*>(msg);
+    if (happyOut != nullptr) {
+        happinessChart.addItem(happyOut->happiness);
     }
 }

@@ -36,8 +36,8 @@ void MainContentComponent::paint (Graphics& g)
 
 void MainContentComponent::resized()
 {
-    intervalScoreComponent->setBounds(20, 20, getWidth() / 2.0 - 20 - 5, getHeight() / 2.0 - 20 - 5);
-    loudnessComponent->setBounds(20, intervalScoreComponent->getBottom() + 10, getWidth() / 2.0 - 20 - 5, getHeight() / 2.0 - 20 - 5);
+    intervalScoreComponent->setBounds(20, 20, getWidth() / 2.0 - 20 - 5, getHeight() * 3.0 / 4.0 - 20 - 5);
+    loudnessComponent->setBounds(20, intervalScoreComponent->getBottom() + 10, getWidth() / 2.0 - 20 - 5, getHeight() / 4.0 - 20 - 5);
     emotionsComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, getWidth() / 2.0 - 20 - 5, getHeight() - 40);
 }
 

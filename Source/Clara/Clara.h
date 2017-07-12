@@ -91,10 +91,26 @@ public:
         Array<float> intervals;
         Array<float> intervalPresenceWeights;
 	};
-
-public:
-	Array<float> getExcitementBuffer();
-
+    
+    class HappinessNode : public Node
+    {
+    public:
+        class HappinessNodeOutput : public Message {
+        public:
+            float happiness;
+            HappinessNodeOutput(float happiness) : happiness(happiness) {}
+        };
+    public:
+        HappinessNode(Clara* clara);
+        void tick() override;
+    public:
+        Clara *clara = nullptr;
+    public:
+        float happiness = 0;
+        Array<float> majorLearnedWeights;
+        Array<float> minorLearnedWeights;
+    };
+    
 public:
 	void setUpNodes();
 	void run() override;
@@ -105,6 +121,7 @@ public:
 private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
     ScopedPointer<IntervalGenerator> intervalGeneratorNode;
+    ScopedPointer<HappinessNode> happinessNode;
     
 	float **samples;
 	int numSamples;

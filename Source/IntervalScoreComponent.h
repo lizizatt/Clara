@@ -14,6 +14,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Clara/Clara.h"
+#include "BacklookChart.h"
 
 
 //==============================================================================
@@ -34,9 +35,10 @@ private:
     Clara *clara = nullptr;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IntervalScoreComponent)
     
-    OwnedArray<Array<float>> prevWeights;
     Array<float> intervals;
     int root;
+    
+    OwnedArray<BacklookChart> backlookCharts;
 };
 
 

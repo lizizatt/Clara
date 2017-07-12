@@ -10,6 +10,9 @@
       <FILE id="Qz9HxS" name="ClaraNodes.cpp" compile="1" resource="0" file="Source/Clara/ClaraNodes.cpp"/>
     </GROUP>
     <GROUP id="{28307E5F-D034-757B-7777-567BD5E5616D}" name="Source">
+      <FILE id="Ih5FRj" name="BacklookChart.cpp" compile="1" resource="0"
+            file="Source/BacklookChart.cpp"/>
+      <FILE id="r9CHBU" name="BacklookChart.h" compile="0" resource="0" file="Source/BacklookChart.h"/>
       <FILE id="bIZtqh" name="EmotionsComponent.cpp" compile="1" resource="0"
             file="Source/EmotionsComponent.cpp"/>
       <FILE id="yiQcvG" name="EmotionsComponent.h" compile="0" resource="0"

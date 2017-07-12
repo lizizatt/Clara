@@ -28,12 +28,13 @@ void Clara::setUpNodes()
 {
     intervalGeneratorNode = new IntervalGenerator(this, myBuffer);
     loudnessMetricNode = new LoudnessMetric(this, myBuffer);
+    happinessNode = new HappinessNode(this);
 }
 
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/bachcello.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/repost.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -91,9 +92,4 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
     for (int c = 0; readyToPlayAudio && c < outputBuffer.buffer->getNumChannels(); c++) {
         outputBuffer.buffer->copyFrom(c, outputBuffer.startSample, *myBuffer, c, outputBuffer.startSample, outputBuffer.numSamples);
     }
-}
-
-Array<float> Clara::getExcitementBuffer()
-{
-	return excitementBuffer;
 }
