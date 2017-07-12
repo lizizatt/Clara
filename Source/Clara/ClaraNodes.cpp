@@ -95,7 +95,7 @@ void Clara::IntervalGenerator::tick()
     
     //normalize
     for (int i = 0; i < intervalPresenceWeights.size(); i++) {
-        intervalPresenceWeights.set(i, 1.0 - pow(intervalPresenceWeights[i] / maxScore, 2));
+        intervalPresenceWeights.set(i, pow(intervalPresenceWeights[i] / maxScore, 2));
     }
     
     clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights, root));
