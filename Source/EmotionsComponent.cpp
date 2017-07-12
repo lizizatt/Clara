@@ -40,8 +40,4 @@ void EmotionsComponent::handleMessage(const Message &m)
 {
     Message *msg = const_cast<Message*>(&m);
     
-    Clara::HappinessNode::HappinessNodeOutput* happyOut = dynamic_cast<Clara::HappinessNode::HappinessNodeOutput*>(msg);
-    if (happyOut != nullptr) {
-        happinessChart.addItem(happyOut->happiness);
-    }
 }

@@ -126,30 +126,30 @@ void Clara::LoudnessMetric::tick()
     clara->postMessage(new Clara::LoudnessMetric::LoudnessMetricOutput(loudness));
 }
 
-Clara::HappinessNode::HappinessNode(Clara *clara)
-: clara(clara) {
+Clara::MusicHormoneNode::MusicHormoneNode(Clara *clara)
+: clara(clara)
+{
     for (int i = 0; i < 12; i++) {
         majorLearnedWeights.add(0);
         minorLearnedWeights.add(0);
     }
-    
+
     //majr 3rd
     majorLearnedWeights.set(0, 1);
     majorLearnedWeights.set(4, 5);
     majorLearnedWeights.set(7, 1);
-    
+
     //minor 3rd
     minorLearnedWeights.set(0, 1);
     minorLearnedWeights.set(3, 5);
     minorLearnedWeights.set(7, 1);
 }
 
-void Clara::HappinessNode::tick()
+void Clara::MusicHormoneNode::tick()
 {
     Array<float> intervals = clara->intervalGeneratorNode->intervals;
     Array<float> weights = clara->intervalGeneratorNode->intervalPresenceWeights;
     float loudness = clara->loudnessMetricNode->loudness;
-    const float antidepressant = .1;
     
     float minorWeight = 0;
     float majorWeight = 0;
@@ -158,11 +158,17 @@ void Clara::HappinessNode::tick()
         majorWeight += majorLearnedWeights[i] * weights[i];
     }
     
-    float toAdd = majorWeight - minorWeight + antidepressant;
-    toAdd = toAdd / fmax(1.0, fabs(happiness)) * loudness;
-    happiness += toAdd;
+    clara->serotoninLevel += majorWeight * loudness;
+    clara->dopamineLevel += majorWeight * loudness;
     
-    //DBG(String::formatted("Major %f, minor %f, happy %f", majorWeight, minorWeight, happiness));
-    
-    clara->postMessage(new Clara::HappinessNode::HappinessNodeOutput(happiness));
+    clara->notifyNeurotransmitters();
+}
+
+Clara::EmotionGenerationNode::EmotionGenerationNode(Clara *clara)
+: clara(clara)
+{
+}
+
+void Clara::EmotionGenerationNode::tick()
+{
 }

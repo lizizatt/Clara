@@ -29,12 +29,53 @@ class Clara : public Thread, public MessageListenerList
 public:
 	static const double tick_seconds ;
 	static const int LOOKBACK_LIMIT;
-
+    
+    enum Emotion {
+        shame = 0,
+        distress,
+        terror,
+        anger,
+        disgust,
+        surprise,
+        joy,
+        excitement,
+        null
+    };
+    
 public:
     Clara();
     ~Clara();
 
 public:
+    
+    class HormoneUpdateMessage : public Message
+    {
+    public:
+        Array<float> currentEmotionMap;
+        HormoneUpdateMessage(Array<float> currentEmotionMap) : currentEmotionMap(currentEmotionMap) {}
+    };
+    
+    class SerotoninUpdateMessage : public Message
+    {
+    public:
+        float serotonin;
+        SerotoninUpdateMessage(float serotonin) : serotonin(serotonin) {}
+    };
+    
+    class DopamineUpdateMessage : public Message
+    {
+    public:
+        float dopamine;
+        DopamineUpdateMessage(float dopamine) : dopamine(dopamine) {}
+    };
+    
+    class NoradrenalineUpdateMessage : public Message
+    {
+    public:
+        float noradrelaine;
+        NoradrenalineUpdateMessage(float noradrelaine) : noradrelaine(noradrelaine) {}
+    };
+    
 	class Node
 	{
 	public:
@@ -92,16 +133,10 @@ public:
         Array<float> intervalPresenceWeights;
 	};
     
-    class HappinessNode : public Node
+    class MusicHormoneNode : public Node
     {
     public:
-        class HappinessNodeOutput : public Message {
-        public:
-            float happiness;
-            HappinessNodeOutput(float happiness) : happiness(happiness) {}
-        };
-    public:
-        HappinessNode(Clara* clara);
+        MusicHormoneNode(Clara* clara);
         void tick() override;
     public:
         Clara *clara = nullptr;
@@ -111,18 +146,38 @@ public:
         Array<float> minorLearnedWeights;
     };
     
+    class EmotionGenerationNode : public Node
+    {
+    public:
+        EmotionGenerationNode(Clara* clara);
+        void tick() override;
+    public:
+        Clara *clara = nullptr;
+    };
+    
 public:
 	void setUpNodes();
 	void run() override;
 	void runNodeOutputs();
 
 	void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
+    
+    void notifyNeurotransmitters();
 
 private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
     ScopedPointer<IntervalGenerator> intervalGeneratorNode;
-    ScopedPointer<HappinessNode> happinessNode;
+    ScopedPointer<MusicHormoneNode> musicHormoneNode;
     
+    //hormones
+    float serotoninLevel = 0.0;
+    float dopamineLevel = 0.0;
+    float noradrenalineLevel = 0.0;
+    
+    //emotions
+    HashMap<Emotion, float> currentEmotionMap;
+    
+    //audio playback
 	float **samples;
 	int numSamples;
 	int nChannels;
@@ -130,8 +185,6 @@ private:
 	CriticalSection audioBufferSection;
     bool readyToPlayAudio = false;
     ScopedPointer<AudioSampleBuffer> myBuffer;
-    
-	Array<float> excitementBuffer;
 };
 
 

@@ -20,6 +20,7 @@ MainContentComponent::MainContentComponent(Clara *clara)
     addAndMakeVisible(intervalScoreComponent = new IntervalScoreComponent(clara));
     addAndMakeVisible(loudnessComponent = new LoudnessComponent(clara));
     addAndMakeVisible(emotionsComponent = new EmotionsComponent(clara));
+    addAndMakeVisible(neuroComponent = new NeurotransmitterComponent(clara));
     setSize (1200, 800);
 }
 
@@ -38,7 +39,7 @@ void MainContentComponent::resized()
 {
     intervalScoreComponent->setBounds(20, 20, getWidth() / 2.0 - 20 - 5, getHeight() * 3.0 / 4.0 - 20 - 5);
     loudnessComponent->setBounds(20, intervalScoreComponent->getBottom() + 10, getWidth() / 2.0 - 20 - 5, getHeight() / 4.0 - 20 - 5);
-    emotionsComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, getWidth() / 2.0 - 20 - 5, getHeight() - 40);
+    neuroComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, getWidth() / 2.0 - 20 - 5, getHeight() - 40);
 }
 
 void MainContentComponent::timerCallback()

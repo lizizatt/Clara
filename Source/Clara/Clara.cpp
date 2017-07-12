@@ -28,7 +28,7 @@ void Clara::setUpNodes()
 {
     intervalGeneratorNode = new IntervalGenerator(this, myBuffer);
     loudnessMetricNode = new LoudnessMetric(this, myBuffer);
-    happinessNode = new HappinessNode(this);
+    musicHormoneNode = new MusicHormoneNode(this);
 }
 
 void Clara::run()
@@ -92,4 +92,15 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
     for (int c = 0; readyToPlayAudio && c < outputBuffer.buffer->getNumChannels(); c++) {
         outputBuffer.buffer->copyFrom(c, outputBuffer.startSample, *myBuffer, c, outputBuffer.startSample, outputBuffer.numSamples);
     }
+}
+
+void Clara::notifyNeurotransmitters()
+{
+    serotoninLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
+    dopamineLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
+    noradrenalineLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
+    
+    postMessage(new Clara::SerotoninUpdateMessage(serotoninLevel));
+    postMessage(new Clara::DopamineUpdateMessage(dopamineLevel));
+    postMessage(new Clara::NoradrenalineUpdateMessage(noradrenalineLevel));
 }

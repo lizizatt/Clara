@@ -15,6 +15,7 @@
 #include "IntervalScoreComponent.h"
 #include "LoudnessComponent.h"
 #include "EmotionsComponent.h"
+#include "NeurotransmitterComponent.h"
 
 //==============================================================================
 /*
@@ -41,6 +42,7 @@ private:
     ScopedPointer<IntervalScoreComponent> intervalScoreComponent;
     ScopedPointer<LoudnessComponent> loudnessComponent;
     ScopedPointer<EmotionsComponent> emotionsComponent;
+    ScopedPointer<NeurotransmitterComponent> neuroComponent;
     
 	Clara *clara = nullptr;
     //==============================================================================
