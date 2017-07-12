@@ -29,6 +29,7 @@ void Clara::setUpNodes()
     intervalGeneratorNode = new IntervalGenerator(this, myBuffer);
     loudnessMetricNode = new LoudnessMetric(this, myBuffer);
     musicHormoneNode = new MusicHormoneNode(this);
+    neurotransmitterManagerNode = new NeurotransmitterManagerNode(this);
 }
 
 void Clara::run()

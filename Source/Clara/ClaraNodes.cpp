@@ -158,62 +158,44 @@ void Clara::MusicHormoneNode::tick()
         majorWeight += majorLearnedWeights[i] * weights[i];
     }
     
-    clara->serotoninLevel += majorWeight * loudness;
-    clara->serotoninLevel -= minorWeight * loudness;
-    clara->dopamineLevel += majorWeight * loudness;
+    clara->deltaSerotonin += majorWeight;
+    clara->deltaDopamine -= minorWeight;
+    clara->deltaNoradrenaline += majorWeight * loudness;
+    
+    DBG(String::formatted("Major %f, minor %f, loudness %f", majorWeight, minorWeight, loudness));
     
     clara->notifyNeurotransmitters();
 }
 
-Clara::EmotionGenerationNode::EmotionGenerationNode(Clara *clara)
+Clara::NeurotransmitterManagerNode::NeurotransmitterManagerNode(Clara *clara)
 : clara(clara)
 {
 }
 
-void Clara::EmotionGenerationNode::tick()
+void Clara::NeurotransmitterManagerNode::tick()
 {
-    /*
-    float sero = clara->serotoninLevel;
-    float dopa = clara->dopamineLevel;
-    float nora = clara->noradrenalineLevel;
+    float deltaS = clara->deltaSerotonin;
+    float deltaD = clara->deltaDopamine;
+    float deltaN = clara->deltaNoradrenaline;
     
-    float seroCost = .1;
-    float dopaCost = .1;
-    float noraCost = .1;
+    clara->deltaSerotonin = 0;
+    clara->deltaDopamine = 0;
+    clara->deltaNoradrenaline = 0;
     
-    float max = 0;
+    float curS = clara->serotoninLevel;
+    float curD = clara->dopamineLevel;
+    float curN = clara->noradrenalineLevel;
     
-    for (int i = 0; i < Emotion::null; i++) {
-        Emotion e = (Emotion) i;
-        float toAdd = 0;
-        switch (e) {
-            case (Emotion::shame): {
-                
-                break;
-            }
-            case (Emotion::distress): {
-                break;
-            }
-            case (Emotion::terror): {
-                break;
-            }
-            case (Emotion::anger): {
-                break;
-            }
-            case (Emotion::disgust): {
-                break;
-            }
-            case (Emotion::surprise): {
-                break;
-            }
-            case (Emotion::joy): {
-                break;
-            }
-            case (Emotion::excitement): {
-                break;
-            }
-        }
-        clara->currentEmotionMap.set(e, clara->currentEmotionMap[e] + toAdd);
-    }
-     */
+    float diffS = .5 - curS;
+    float diffD = .5 - curD;
+    float diffN = .5 - curN;
+    float diffWeight = .1;
+    
+    curS += diffWeight * diffS + deltaS;
+    curD += diffWeight * diffD + deltaD;
+    curN += diffWeight * diffN + deltaN;
+    
+    clara->serotoninLevel = fmin(fmax(curS, 0.0), 1.0);
+    clara->dopamineLevel = fmin(fmax(curD, 0.0), 1.0);
+    clara->noradrenalineLevel = fmin(fmax(curN, 0.0), 1.0);
 }

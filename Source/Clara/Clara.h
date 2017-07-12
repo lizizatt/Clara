@@ -146,10 +146,10 @@ public:
         Array<float> minorLearnedWeights;
     };
     
-    class EmotionGenerationNode : public Node
+    class NeurotransmitterManagerNode : public Node
     {
     public:
-        EmotionGenerationNode(Clara* clara);
+        NeurotransmitterManagerNode(Clara* clara);
         void tick() override;
     public:
         Clara *clara = nullptr;
@@ -168,11 +168,16 @@ private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
     ScopedPointer<IntervalGenerator> intervalGeneratorNode;
     ScopedPointer<MusicHormoneNode> musicHormoneNode;
+    ScopedPointer<NeurotransmitterManagerNode> neurotransmitterManagerNode;
     
     //hormones
-    float serotoninLevel = 0.0;
-    float dopamineLevel = 0.0;
-    float noradrenalineLevel = 0.0;
+    float serotoninLevel = 0.5;
+    float dopamineLevel = 0.5;
+    float noradrenalineLevel = 0.5;
+    
+    float deltaSerotonin = 0;
+    float deltaDopamine = 0;
+    float deltaNoradrenaline = 0;
     
     //emotions
     HashMap<Emotion, float> currentEmotionMap;
