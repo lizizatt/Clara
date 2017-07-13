@@ -58,13 +58,6 @@ public:
         PTSUpdateMessage(long pts, long maxPts, double sampleRate) : pts(pts), maxPts(maxPts), sampleRate(sampleRate) {}
     };
     
-    class HormoneUpdateMessage : public Message
-    {
-    public:
-        Array<float> currentEmotionMap;
-        HormoneUpdateMessage(Array<float> currentEmotionMap) : currentEmotionMap(currentEmotionMap) {}
-    };
-    
     class SerotoninUpdateMessage : public Message
     {
     public:
@@ -84,6 +77,13 @@ public:
     public:
         float noradrelaine;
         NoradrenalineUpdateMessage(float noradrelaine) : noradrelaine(noradrelaine) {}
+    };
+    
+    class AverageNeutransmitterValues : public Message
+    {
+    public:
+        float nora, sero, dopa;
+        AverageNeutransmitterValues(float sero, float dopa, float nora) : sero(sero), dopa(dopa), nora(nora) {}
     };
     
 	class Node
@@ -195,6 +195,10 @@ private:
     
     //emotions
     HashMap<Emotion, float> currentEmotionMap;
+    
+    float currentSongAvgS = .5;
+    float currentSongAvgD = .5;
+    float currentSongAvgN = .5;
     
     //audio playback
 	float **samples;

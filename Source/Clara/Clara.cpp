@@ -72,14 +72,22 @@ void Clara::run()
             numSamples = stride;
         }
         
+        Node::runAllNodes();
+        
+        currentSongAvgS = currentSongAvgS * .99 + serotoninLevel * .01;
+        currentSongAvgD = currentSongAvgD * .99 + dopamineLevel * .01;
+        currentSongAvgN = currentSongAvgN * .99 + noradrenalineLevel * .01;
+        
         if (intervalGeneratorNode->tickCount % JUMP_COUNT == 0) {
             postMessage(new PTSUpdateMessage(pts, reader->lengthInSamples, reader->sampleRate));
+            postMessage(new AverageNeutransmitterValues(currentSongAvgS, currentSongAvgD, currentSongAvgN));
         }
         
-        Node::runAllNodes();
         
         wait(10);
 	}
+    
+    DBG(String::formatted("Finished song with S %f, D %f, N %f", currentSongAvgS, currentSongAvgD, currentSongAvgN));
     readyToPlayAudio = false;
 }
 

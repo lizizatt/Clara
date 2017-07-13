@@ -38,7 +38,7 @@ void MainContentComponent::paint (Graphics& g)
     g.fillAll(Colours::black);
     
     g.setColour(Colours::lightgrey);
-    g.drawText(String::formatted("%.1f / %.1f seconds", pts, maxPts), getWidth() / 2.0 - 100, 5, 200, 15, Justification::centred);
+    g.drawText(String::formatted("%.1f / %.1f seconds      S %.2f; D %.2f; N %.2f", pts, maxPts, avgS, avgD, avgN), getWidth() / 2.0 - 150, 5, 300, 15, Justification::centred);
 }
 
 void MainContentComponent::resized()
@@ -71,6 +71,14 @@ void MainContentComponent::handleMessage(const Message &m)
     if (ptsMsg != nullptr) {
         this->pts = (double) ptsMsg->pts / ptsMsg->sampleRate;
         this->maxPts = (double) ptsMsg->maxPts / ptsMsg->sampleRate;
+        repaint();
+    }
+    
+    Clara::AverageNeutransmitterValues *overallUpdate = dynamic_cast<Clara::AverageNeutransmitterValues*>(msg);
+    if (overallUpdate) {
+        avgS = overallUpdate->sero;
+        avgD = overallUpdate->dopa;
+        avgN = overallUpdate->nora;
         repaint();
     }
 }

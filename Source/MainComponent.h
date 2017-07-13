@@ -43,6 +43,9 @@ private:
     
     double pts;
     double maxPts;
+    float avgS;
+    float avgD;
+    float avgN;
     
 	Clara *clara = nullptr;
     //==============================================================================
