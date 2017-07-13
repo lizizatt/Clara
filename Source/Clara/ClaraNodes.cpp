@@ -163,6 +163,33 @@ void Clara::MusicHormoneNode::tick()
         majorWeight += majorLearnedWeights[i] * weights[i];
     }
     
+    float dynamicLearningThreshold = .99;
+    while ((double) rand() / (double) INT_MAX > dynamicLearningThreshold) {
+        
+        float max = 0;
+        int item = 0;
+        for (int i = 1; i < 12; i++) {
+            if (weights[i] > max) {
+                max = weights[i];
+                item = i;
+            }
+        }
+        
+        if (item == 0) {
+            break;
+        }
+        
+        bool major = rand() > INT_MAX / 2;
+        
+        if (major) {
+            majorLearnedWeights.set(item, minorLearnedWeights[item] + (double) rand() / (double) INT_MAX - .5);
+            DBG(String::formatted("Major neuron %d mutated to new value %.2f", item, majorLearnedWeights[item]));
+        }
+        else {
+            minorLearnedWeights.set(item, minorLearnedWeights[item] + (double) rand() / (double) INT_MAX - .5);
+            DBG(String::formatted("Minor neuron %d mutated to new value %.2f", item, minorLearnedWeights[item]));
+        }
+    }
     
     static float avgLoudness = 1;
     
@@ -195,7 +222,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     float diffN = .5 - curN;
     float diffWeight = .1;
     
-    float deltaOverallWeight = .001;
+    static float deltaOverallWeight = .002;
     float deltaWeightS = fabs(deltaS) / fabs(prevDS) * deltaOverallWeight;
     float deltaWeightD = fabs(deltaD) / fabs(prevDD) * deltaOverallWeight;
     float deltaWeightN = fabs(deltaN) / fabs(prevDN) * deltaOverallWeight;
@@ -217,6 +244,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     prevDS = prevDS * lpfscaler + deltaS * (1.0 - lpfscaler);
     prevDD = prevDD * lpfscaler + deltaD * (1.0 - lpfscaler);
     prevDN = prevDN * lpfscaler + deltaN * (1.0 - lpfscaler);
+    
     
     //DBG(String::formatted("S: %f, %f, %f", clara->serotoninLevel, deltaS, prevDS));
     //DBG(String::formatted("D: %f, %f, %f", clara->dopamineLevel, deltaD, prevDD));
