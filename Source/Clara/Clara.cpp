@@ -111,9 +111,15 @@ void Clara::stopSong()
 
 void Clara::pickNextSong()
 {
-    if (memory.size() > 0) {
-        upNext = memory[0];
+    Array<Song*> options;
+    for (int i = 0; i < memory.size(); i++) {
+        if (!memory[i]->hasMeta()) {
+            upNext = memory[i];
+            return;
+        }
+        options.add(memory[i]);
     }
+    upNext = options[rand() % options.size()];
 }
 
 Array<Clara::Song*> Clara::getMemory()

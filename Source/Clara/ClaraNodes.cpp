@@ -218,7 +218,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     float curD = clara->dopamineLevel;
     float curN = clara->noradrenalineLevel;
     
-    float centerline = 0;
+    float centerline = .2;
     float diffS = centerline - curS;
     float diffD = centerline - curD;
     float diffN = centerline - curN;
