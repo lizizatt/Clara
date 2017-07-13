@@ -16,6 +16,53 @@ const int Clara::LOOKBACK_LIMIT = 50;
 const int Clara::JUMP_COUNT = 10;
 
 //==============================================================================
+
+Clara::Song::Song(File songFile)
+: songFile(songFile)
+{
+    metaFile = songFile.getSiblingFile(songFile.getFileNameWithoutExtension() + ".txt");
+    
+    if (hasMeta()) {
+        StringArray contents;
+        metaFile.readLines(contents);
+        for (int i = 0; i < contents.size(); i++) {
+            StringArray split = StringArray::fromTokens(contents[i], ":", "\"");
+            if (split.size() >= 2) {
+                if (split[0] == "S") {
+                    sScore = split[1].getFloatValue();
+                }
+                if (split[0] == "D") {
+                    dScore = split[1].getFloatValue();
+                }
+                if (split[0] == "N") {
+                    nScore = split[1].getFloatValue();
+                }
+            }
+        }
+    }
+}
+
+float Clara::Song::getDScore()
+{
+    return dScore;
+}
+
+float Clara::Song::getNScore()
+{
+    return nScore;
+}
+
+float Clara::Song::getSScore()
+{
+    return sScore;
+}
+
+bool Clara::Song::hasMeta()
+{
+    return metaFile.existsAsFile();
+}
+
+
 Clara::Clara()
 	: Thread("Clara")
 {
@@ -37,15 +84,24 @@ void Clara::run()
 {
     //setup
     setUpNodes();
-    
-    File inputFile = File("~/Clara/Resources/bangarang.mp3");
+    loadMemory();
     
     for (;!threadShouldExit();) {
-        if (inputFile.existsAsFile()) {
-            playSong(inputFile);
+        if (upNext != nullptr) {
+            Song *toPlay = upNext;
+            upNext = nullptr;
+            playSong(toPlay);
+        }
+        else {
+            pickNextSong();
         }
         wait(10);
     }
+}
+
+void Clara::setUpNext(Clara::Song *toPlay)
+{
+    upNext = toPlay;
 }
 
 void Clara::stopSong()
@@ -53,9 +109,75 @@ void Clara::stopSong()
     stopSongFlag = true;
 }
 
-void Clara::playSong(File inputFile)
+void Clara::pickNextSong()
 {
-    FileInputStream *stream = new FileInputStream(inputFile);
+    if (memory.size() > 0) {
+        upNext = memory[0];
+    }
+}
+
+Array<Clara::Song*> Clara::getMemory()
+{
+    Array<Song*> toRet;
+    for (int i = 0; i < memory.size(); i++) {
+        toRet.add(memory[i]);
+    }
+    return toRet;
+}
+
+Clara::Song* Clara::getUpNext()
+{
+    return upNext;
+}
+
+File Clara::getMemoryFolder()
+{
+    File toRet = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile("Clara").getChildFile("Memory");
+    if (!toRet.exists()) {
+        toRet.createDirectory();
+    }
+    return toRet;
+}
+
+void Clara::loadMemory()
+{
+    Array<File> children;
+    getMemoryFolder().findChildFiles(children, File::findFiles, false);
+    
+    for (int i = 0; i < children.size(); i++) {
+        if (children[i].hasFileExtension("mp3")) {
+            addSongToMemory(children[i], false);
+        }
+    }
+    postMessage(new MemoryChanged());
+}
+
+void Clara::addSongToMemory(File song, bool playNow)
+{
+    if (song.existsAsFile()) {
+        if (song.getParentDirectory().getFileName() == "Memory"
+            && song.getParentDirectory().getParentDirectory().getFileName() == "Clara") {
+            //loading from existing clara memory on startup
+            memory.add(new Song(song));
+        }
+        else {
+            File newSongLoc = getMemoryFolder().getChildFile(song.getFileName());
+            song.copyFileTo(newSongLoc);
+            memory.add(new Song(newSongLoc));
+        }
+        postMessage(new MemoryChanged());
+    }
+}
+
+Clara::Song* Clara::getCurrentlyPlaying()
+{
+    return currentlyPlaying;
+}
+
+void Clara::playSong(Song *toPlay)
+{
+    currentlyPlaying = toPlay;
+    FileInputStream *stream = new FileInputStream(toPlay->songFile);
     
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -72,6 +194,7 @@ void Clara::playSong(File inputFile)
     
     Time lastUpdate = Time::getCurrentTime();
     
+    postMessage(new PlaybackStateChanged());
     //run
     DBG("Running");
     for (int i = 0; !stopSongFlag && !threadShouldExit(); i++) {
@@ -106,6 +229,24 @@ void Clara::playSong(File inputFile)
     stopSongFlag = false;
     DBG(String::formatted("Finished song with S %f, D %f, N %f", currentSongAvgS, currentSongAvgD, currentSongAvgN));
     readyToPlayAudio = false;
+    
+    File metaFile = toPlay->metaFile;
+    if (!metaFile.existsAsFile()) {
+        metaFile.create();
+    }
+    StringArray toWrite;
+    toWrite.add(String::formatted("S:%f", currentSongAvgS));
+    toWrite.add(String::formatted("D:%f", currentSongAvgD));
+    toWrite.add(String::formatted("N:%f", currentSongAvgN));
+    metaFile.replaceWithText(toWrite.joinIntoString("\n"));
+    currentlyPlaying->sScore = currentSongAvgS;
+    currentlyPlaying->dScore = currentSongAvgD;
+    currentlyPlaying->nScore = currentSongAvgN;
+    
+    currentlyPlaying = nullptr;
+    
+    postMessage(new MemoryChanged());
+    postMessage(new PlaybackStateChanged());
 }
 
 void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)

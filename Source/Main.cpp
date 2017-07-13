@@ -30,23 +30,6 @@ public:
 		clara.startThread();
 		mainWindow = new MainWindow(getApplicationName(), &clara);
 
-		/*
-		StringArray args = StringArray::fromTokens(commandLine, " ", "\"");
-		bool any = false;
-		if (args.contains("--audio")) {
-			int audio = args.indexOf("--audio");
-			if (audio > args.size() + 1) {
-				String audioPath = args[audio + 1];
-
-
-				any = true;
-			}
-		}
-
-		if (!any) {
-			DBG(instructions);
-		}
-		*/
     }
     void shutdown() override
     {
@@ -81,6 +64,8 @@ public:
 
             centreWithSize (getWidth(), getHeight());
             setVisible (true);
+            
+            setResizable(true, true);
         }
 
         void closeButtonPressed() override

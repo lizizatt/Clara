@@ -44,7 +44,7 @@ void MainContentComponent::paint (Graphics& g)
 
 void MainContentComponent::resized()
 {
-    int leftCol = 200;
+    int leftCol = 300;
     nowPlayingComponent->setBounds(20, 20, leftCol, getHeight() - 40);
     
     Rectangle<int> mainPane(40 + leftCol, 20, getWidth() - 60 - leftCol, getHeight() - 40);

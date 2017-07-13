@@ -49,10 +49,32 @@ public:
 
 public:
     
+    class Song
+    {
+    public:
+        Song(File songFile);
+        float getSScore();
+        float getDScore();
+        float getNScore();
+        bool hasMeta();
+    public:
+        File songFile;
+        File metaFile;
+        float sScore = 0;
+        float dScore = 0;
+        float nScore = 0;
+    };
+    
     class PlaybackStateChanged : public Message
     {
     public:
         PlaybackStateChanged() {}
+    };
+    
+    class MemoryChanged : public Message
+    {
+    public:
+        MemoryChanged() {}
     };
     
     class PTSUpdateMessage : public Message
@@ -181,9 +203,19 @@ public:
 
 	void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
     void notifyNeurotransmitters();
+    
+    void addSongToMemory(File song, bool addToQueue = true);
 
+    Array<Song*> getMemory();
+    Song* getCurrentlyPlaying();
+    Song* getUpNext();
+    void setUpNext(Song* toPlay);
+    
 private:
-    void playSong(File song);
+    void pickNextSong();
+    void playSong(Song *song);
+    void loadMemory();
+    File getMemoryFolder();
     
 private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
@@ -217,11 +249,9 @@ private:
     ScopedPointer<AudioSampleBuffer> myBuffer;
     bool stopSongFlag = false;
     
-    class Song
-    {
-        //songs exist in memory
-    public:
-    };
+    Song* currentlyPlaying = nullptr;
+    Song* upNext = nullptr;
+    OwnedArray<Song> memory;
 };
 
 
