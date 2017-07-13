@@ -49,6 +49,12 @@ public:
 
 public:
     
+    class PlaybackStateChanged : public Message
+    {
+    public:
+        PlaybackStateChanged() {}
+    };
+    
     class PTSUpdateMessage : public Message
     {
     public:
@@ -113,10 +119,9 @@ public:
             LoudnessMetricOutput(float loudness) : loudness(loudness) {}
         };
     public:
-        LoudnessMetric(Clara* clara, AudioSampleBuffer *buffer) : clara(clara), buffer(buffer) {}
+        LoudnessMetric(Clara* clara) : clara(clara) {}
         void tick() override;
     public: //input
-        AudioSampleBuffer *buffer;
         Clara* clara = nullptr;
     public: //output
         float loudness = 0;
@@ -133,10 +138,9 @@ public:
             IntervalGeneratorOutput(Array<float> intervals, Array<float> intervalPresenceWeights, int rootIndex) : intervals(intervals), intervalPresenceWeights(intervalPresenceWeights), rootIndex(rootIndex) {}
         };
     public:
-        IntervalGenerator(Clara* clara, AudioSampleBuffer *buffer) : clara(clara), buffer(buffer) {}
+        IntervalGenerator(Clara* clara) : clara(clara) {}
 		void tick() override;
     public: //input
-        AudioSampleBuffer *buffer;
         Clara* clara = nullptr;
     public: //output
         Array<float> intervals;
@@ -172,12 +176,15 @@ public:
 public:
 	void setUpNodes();
 	void run() override;
-	void runNodeOutputs();
+    
+    void stopSong();
 
 	void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
-    
     void notifyNeurotransmitters();
 
+private:
+    void playSong(File song);
+    
 private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
     ScopedPointer<IntervalGenerator> intervalGeneratorNode;
@@ -208,6 +215,13 @@ private:
 	CriticalSection audioBufferSection;
     bool readyToPlayAudio = false;
     ScopedPointer<AudioSampleBuffer> myBuffer;
+    bool stopSongFlag = false;
+    
+    class Song
+    {
+        //songs exist in memory
+    public:
+    };
 };
 
 

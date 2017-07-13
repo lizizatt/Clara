@@ -12,7 +12,6 @@
 #define INTERVALSCORECOMPONENT_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "Clara/Clara.h"
 #include "BacklookChart.h"
 

@@ -38,18 +38,18 @@ void Clara::IntervalGenerator::tick()
     intervals.clear();
     intervalPresenceWeights.clear();
     
-    FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * buffer->getNumSamples());
-    FFT::Complex* outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * buffer->getNumSamples());
+    FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * clara->myBuffer->getNumSamples());
+    FFT::Complex* outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * clara->myBuffer->getNumSamples());
     
     FFT fft(9, false);
     
-    for (int c = 0; c < buffer->getNumChannels(); c++) {
-        for (int i = 0; i < buffer->getNumSamples(); i++) {
+    for (int c = 0; c < clara->myBuffer->getNumChannels(); c++) {
+        for (int i = 0; i < clara->myBuffer->getNumSamples(); i++) {
             if (c == 0) {
                 inputToFFT[i].r = 0;
                 inputToFFT[i].i = 0;
             }
-            inputToFFT[i].r += buffer->getSample(c, i);
+            inputToFFT[i].r += clara->myBuffer->getSample(c, i);
         }
     }
     
@@ -58,15 +58,15 @@ void Clara::IntervalGenerator::tick()
     Array<float> frequencyCounts;
     
     //pass to audio nodes
-    double peakFrequency = 512 * clara->sampleRate / buffer->getNumSamples();
+    double peakFrequency = 512 * clara->sampleRate / clara->myBuffer->getNumSamples();
     for (int i = 0; i < frequencies.size(); i++) {
         //each ear node represents a base frequency
         //we want to fill it with the sum of the base frequency and all harmonics up to max frequency
         double toAdd = 0;
         double freq = frequencies[i];
         while (freq < peakFrequency) {
-            int pos = (freq / peakFrequency) * buffer->getNumSamples();
-            if (pos >= 0 && pos < buffer->getNumSamples())
+            int pos = (freq / peakFrequency) * clara->myBuffer->getNumSamples();
+            if (pos >= 0 && pos < clara->myBuffer->getNumSamples())
             {
                 toAdd += sqrt(pow(outputFromFFT[pos].r, 2) + pow(outputFromFFT[pos].i, 2));
                 //DBG(String::formatted("Added value %f for base frequency %f, harmonic %f", toAdd, earNodes[i]->frequency, freq));
@@ -113,9 +113,9 @@ void Clara::LoudnessMetric::tick()
     float minIntensity = 0;
     float count = 0;
     
-    for (int i = 0; i < buffer->getNumChannels(); i++) {
-        for (int j = 0; j < buffer->getNumSamples(); j++) {
-            float sample = buffer->getSample(i, j);
+    for (int i = 0; i < clara->myBuffer->getNumChannels(); i++) {
+        for (int j = 0; j < clara->myBuffer->getNumSamples(); j++) {
+            float sample = clara->myBuffer->getSample(i, j);
             avgIntensity += fabs(sample);
             minIntensity = minIntensity > sample? sample : minIntensity;
             maxIntensity = maxIntensity < sample? sample : maxIntensity;

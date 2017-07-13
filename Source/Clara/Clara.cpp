@@ -27,38 +27,54 @@ Clara::~Clara()
 
 void Clara::setUpNodes()
 {
-    intervalGeneratorNode = new IntervalGenerator(this, myBuffer);
-    loudnessMetricNode = new LoudnessMetric(this, myBuffer);
+    intervalGeneratorNode = new IntervalGenerator(this);
+    loudnessMetricNode = new LoudnessMetric(this);
     musicHormoneNode = new MusicHormoneNode(this);
     neurotransmitterManagerNode = new NeurotransmitterManagerNode(this);
 }
 
 void Clara::run()
 {
-	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/bangarang.mp3"));
+    //setup
+    setUpNodes();
+    
+    File inputFile = File("~/Clara/Resources/bangarang.mp3");
+    
+    for (;!threadShouldExit();) {
+        if (inputFile.existsAsFile()) {
+            playSong(inputFile);
+        }
+        wait(10);
+    }
+}
 
+void Clara::stopSong()
+{
+    stopSongFlag = true;
+}
+
+void Clara::playSong(File inputFile)
+{
+    FileInputStream *stream = new FileInputStream(inputFile);
+    
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
-	ScopedPointer<AudioFormatReader> reader = formatManager.createReaderFor(stream);
-
-
-	nChannels = reader->numChannels;
-	int stepRate = 512;
-	long pts = 0;
+    ScopedPointer<AudioFormatReader> reader = formatManager.createReaderFor(stream);
+    
+    
+    nChannels = reader->numChannels;
+    int stepRate = 512;
+    long pts = 0;
     sampleRate = reader->sampleRate;
     
     myBuffer = new AudioSampleBuffer(nChannels, stepRate);
     myBuffer->clear();
     
-    //setup
-    setUpNodes();
-    
     Time lastUpdate = Time::getCurrentTime();
-
-	//run
-	DBG("Running");
-    for (int i = 0; !threadShouldExit(); i++) {
+    
+    //run
+    DBG("Running");
+    for (int i = 0; !stopSongFlag && !threadShouldExit(); i++) {
         //grab audio and run nodes to process it
         
         if (true) {
@@ -85,14 +101,11 @@ void Clara::run()
         
         
         wait(10);
-	}
+    }
     
+    stopSongFlag = false;
     DBG(String::formatted("Finished song with S %f, D %f, N %f", currentSongAvgS, currentSongAvgD, currentSongAvgN));
     readyToPlayAudio = false;
-}
-
-void Clara::runNodeOutputs()
-{
 }
 
 void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)

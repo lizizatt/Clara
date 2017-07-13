@@ -16,6 +16,7 @@
 #include "LoudnessComponent.h"
 #include "EmotionsComponent.h"
 #include "NeurotransmitterComponent.h"
+#include "NowPlayingComponent.h"
 
 
 class MainContentComponent   : public AudioAppComponent, public Timer, public MessageListener
@@ -40,6 +41,7 @@ private:
     ScopedPointer<LoudnessComponent> loudnessComponent;
     ScopedPointer<EmotionsComponent> emotionsComponent;
     ScopedPointer<NeurotransmitterComponent> neuroComponent;
+    ScopedPointer<NowPlayingComponent> nowPlayingComponent;
     
     double pts;
     double maxPts;

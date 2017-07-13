@@ -21,6 +21,7 @@ MainContentComponent::MainContentComponent(Clara *clara)
     addAndMakeVisible(loudnessComponent = new LoudnessComponent(clara));
     addAndMakeVisible(emotionsComponent = new EmotionsComponent(clara));
     addAndMakeVisible(neuroComponent = new NeurotransmitterComponent(clara));
+    addAndMakeVisible(nowPlayingComponent = new NowPlayingComponent(clara));
     setSize (1200, 800);
     
     clara->addListener(this);
@@ -43,9 +44,13 @@ void MainContentComponent::paint (Graphics& g)
 
 void MainContentComponent::resized()
 {
-    intervalScoreComponent->setBounds(20, 20, getWidth() / 2.0 - 20 - 5, getHeight() * 3.0 / 4.0 - 20 - 5);
-    loudnessComponent->setBounds(20, intervalScoreComponent->getBottom() + 10, getWidth() / 2.0 - 20 - 5, getHeight() / 4.0 - 20 - 5);
-    neuroComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, getWidth() / 2.0 - 20 - 5, getHeight() - 40);
+    int leftCol = 200;
+    nowPlayingComponent->setBounds(20, 20, leftCol, getHeight() - 40);
+    
+    Rectangle<int> mainPane(40 + leftCol, 20, getWidth() - 60 - leftCol, getHeight() - 40);
+    intervalScoreComponent->setBounds(mainPane.getX() + 20, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() * 3.0 / 4.0 - 20 - 5);
+    loudnessComponent->setBounds(mainPane.getX() + 20, intervalScoreComponent->getBottom() + 10, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() / 4.0 - 20 - 5);
+    neuroComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() - 40);
 }
 
 void MainContentComponent::timerCallback()
