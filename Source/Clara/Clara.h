@@ -28,7 +28,8 @@ class Clara : public Thread, public MessageListenerList
 {
 public:
 	static const double tick_seconds ;
-	static const int LOOKBACK_LIMIT;
+    static const int LOOKBACK_LIMIT;
+    static const int JUMP_COUNT;
     
     enum Emotion {
         shame = 0,
@@ -47,6 +48,15 @@ public:
     ~Clara();
 
 public:
+    
+    class PTSUpdateMessage : public Message
+    {
+    public:
+        long pts;
+        long maxPts;
+        double sampleRate;
+        PTSUpdateMessage(long pts, long maxPts, double sampleRate) : pts(pts), maxPts(maxPts), sampleRate(sampleRate) {}
+    };
     
     class HormoneUpdateMessage : public Message
     {

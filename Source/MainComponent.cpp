@@ -22,10 +22,13 @@ MainContentComponent::MainContentComponent(Clara *clara)
     addAndMakeVisible(emotionsComponent = new EmotionsComponent(clara));
     addAndMakeVisible(neuroComponent = new NeurotransmitterComponent(clara));
     setSize (1200, 800);
+    
+    clara->addListener(this);
 }
 
 MainContentComponent::~MainContentComponent()
 {
+    clara->removeListener(this);
     shutdownAudio();
 	stopTimer();
 }
@@ -33,6 +36,9 @@ MainContentComponent::~MainContentComponent()
 void MainContentComponent::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
+    
+    g.setColour(Colours::lightgrey);
+    g.drawText(String::formatted("%.1f / %.1f seconds", pts, maxPts), getWidth() / 2.0 - 100, 5, 200, 15, Justification::centred);
 }
 
 void MainContentComponent::resized()
@@ -55,4 +61,16 @@ void MainContentComponent::prepareToPlay(int samplesPerBlock, double sampleRate)
 void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo &buffer)
 {
     clara->getNextAudioBlock(buffer);
+}
+
+void MainContentComponent::handleMessage(const Message &m)
+{
+    Message *msg = const_cast<Message*>(&m);
+    
+    Clara::PTSUpdateMessage *ptsMsg = dynamic_cast<Clara::PTSUpdateMessage*>(msg);
+    if (ptsMsg != nullptr) {
+        this->pts = (double) ptsMsg->pts / ptsMsg->sampleRate;
+        this->maxPts = (double) ptsMsg->maxPts / ptsMsg->sampleRate;
+        repaint();
+    }
 }

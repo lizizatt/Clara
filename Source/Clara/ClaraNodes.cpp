@@ -98,8 +98,10 @@ void Clara::IntervalGenerator::tick()
         intervalPresenceWeights.set(i, pow(intervalPresenceWeights[i] / maxScore, 2));
     }
     
-    clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights, root));
-
+    if (tickCount % JUMP_COUNT == 0) {
+        clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights, root));
+    }
+        
     delete inputToFFT;
     delete outputFromFFT;
 }
@@ -123,7 +125,10 @@ void Clara::LoudnessMetric::tick()
     
     avgIntensity = avgIntensity / count;
     loudness = avgIntensity;
-    clara->postMessage(new Clara::LoudnessMetric::LoudnessMetricOutput(loudness));
+    
+    if (tickCount % JUMP_COUNT == 0) {
+        clara->postMessage(new Clara::LoudnessMetric::LoudnessMetricOutput(loudness));
+    }
 }
 
 Clara::MusicHormoneNode::MusicHormoneNode(Clara *clara)
@@ -158,9 +163,12 @@ void Clara::MusicHormoneNode::tick()
         majorWeight += majorLearnedWeights[i] * weights[i];
     }
     
-    clara->deltaSerotonin += majorWeight;
-    clara->deltaDopamine -= minorWeight;
-    clara->deltaNoradrenaline += majorWeight * loudness;
+    
+    static float avgLoudness = 1;
+    
+    clara->deltaSerotonin += majorWeight - minorWeight;
+    clara->deltaDopamine += majorWeight - minorWeight;
+    clara->deltaNoradrenaline += loudness - avgLoudness;
 }
 
 Clara::NeurotransmitterManagerNode::NeurotransmitterManagerNode(Clara *clara)
@@ -187,7 +195,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     float diffN = .5 - curN;
     float diffWeight = .1;
     
-    float deltaOverallWeight = .01;
+    float deltaOverallWeight = .001;
     float deltaWeightS = fabs(deltaS) / fabs(prevDS) * deltaOverallWeight;
     float deltaWeightD = fabs(deltaD) / fabs(prevDD) * deltaOverallWeight;
     float deltaWeightN = fabs(deltaN) / fabs(prevDN) * deltaOverallWeight;
@@ -200,7 +208,9 @@ void Clara::NeurotransmitterManagerNode::tick()
     clara->dopamineLevel = fmin(fmax(curD, 0.0), 1.0);
     clara->noradrenalineLevel = fmin(fmax(curN, 0.0), 1.0);
     
-    clara->notifyNeurotransmitters();
+    if (tickCount % JUMP_COUNT == 0) {
+        clara->notifyNeurotransmitters();
+    }
     
     //maintain rolling average of previous delta values
     float lpfscaler = .95;

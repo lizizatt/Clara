@@ -17,12 +17,8 @@
 #include "EmotionsComponent.h"
 #include "NeurotransmitterComponent.h"
 
-//==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainContentComponent   : public AudioAppComponent, public Timer
+
+class MainContentComponent   : public AudioAppComponent, public Timer, public MessageListener
 {
 public:
     //==============================================================================
@@ -35,6 +31,7 @@ public:
     void prepareToPlay(int samplesPerBlock, double sampleRate) override;
     void releaseResources() override {};
     void getNextAudioBlock(const AudioSourceChannelInfo &buffer);
+    void handleMessage(const Message &m) override;
 
 	void timerCallback() override;
 
@@ -43,6 +40,9 @@ private:
     ScopedPointer<LoudnessComponent> loudnessComponent;
     ScopedPointer<EmotionsComponent> emotionsComponent;
     ScopedPointer<NeurotransmitterComponent> neuroComponent;
+    
+    double pts;
+    double maxPts;
     
 	Clara *clara = nullptr;
     //==============================================================================

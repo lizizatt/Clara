@@ -13,6 +13,7 @@
 
 const double Clara::tick_seconds = 0.1;
 const int Clara::LOOKBACK_LIMIT = 50;
+const int Clara::JUMP_COUNT = 10;
 
 //==============================================================================
 Clara::Clara()
@@ -35,7 +36,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/allstarchorale.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/bachcello.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -52,32 +53,32 @@ void Clara::run()
     
     //setup
     setUpNodes();
-
-	Time start = Time::getCurrentTime();
-	Time lastCheck = start;
     
+    Time lastUpdate = Time::getCurrentTime();
+
 	//run
 	DBG("Running");
     for (int i = 0; !threadShouldExit(); i++) {
-        
         //grab audio and run nodes to process it
-		long currentPtsCap = fmin((Time::getCurrentTime() - start).inSeconds() * reader->sampleRate, reader->lengthInSamples) + reader->sampleRate;
-		while (pts < currentPtsCap) {
-            if (true) {
-                ScopedLock lock(audioBufferSection);
-                readyToPlayAudio = true;
-                int stride = fmin(stepRate, reader->lengthInSamples - pts);
-                myBuffer->clear();
-                reader->read(myBuffer, 0, stride, pts, false, false);
-                pts += stride;
-                numSamples = stride;
-            }
+        
+        if (true) {
+            ScopedLock lock(audioBufferSection);
+            readyToPlayAudio = true;
             
-            lastCheck = Time::getCurrentTime();
-            Node::runAllNodes();
+            long stride = fmin(stepRate, reader->lengthInSamples - pts);
+            myBuffer->clear();
+            reader->read(myBuffer, 0, stride, pts, false, false);
+            pts += stride;
+            numSamples = stride;
         }
-
-		wait(5);
+        
+        if (intervalGeneratorNode->tickCount % JUMP_COUNT == 0) {
+            postMessage(new PTSUpdateMessage(pts, reader->lengthInSamples, reader->sampleRate));
+        }
+        
+        Node::runAllNodes();
+        
+        wait(10);
 	}
     readyToPlayAudio = false;
 }
@@ -97,9 +98,9 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 
 void Clara::notifyNeurotransmitters()
 {
-    serotoninLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
-    dopamineLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
-    noradrenalineLevel = fmax(fmin(serotoninLevel, 1000.0), 0.0);
+    serotoninLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
+    dopamineLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
+    noradrenalineLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
     
     postMessage(new Clara::SerotoninUpdateMessage(serotoninLevel));
     postMessage(new Clara::DopamineUpdateMessage(dopamineLevel));
