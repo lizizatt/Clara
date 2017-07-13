@@ -218,20 +218,22 @@ void Clara::NeurotransmitterManagerNode::tick()
     float curD = clara->dopamineLevel;
     float curN = clara->noradrenalineLevel;
     
-    float diffS = .5 - curS;
-    float diffD = .5 - curD;
-    float diffN = .5 - curN;
-    float diffWeight = .1;
+    float centerline = 0;
+    float diffS = centerline - curS;
+    float diffD = centerline - curD;
+    float diffN = centerline - curN;
+    float diffWeightSD = .1;
+    float diffWeightN = .01;
     
-    static float deltaOverallWeightSD = .005;
+    static float deltaOverallWeightSD = .01;
     static float deltaOverallWeightN = .01;
     float deltaWeightS = fabs(deltaS) / fabs(prevDS) * deltaOverallWeightSD;
     float deltaWeightD = fabs(deltaD) / fabs(prevDD) * deltaOverallWeightSD;
     float deltaWeightN = fabs(deltaN) / fabs(prevDN) * deltaOverallWeightN;
     
-    curS += diffWeight * diffS + deltaS * deltaWeightS;
-    curD += diffWeight * diffD + deltaD * deltaWeightD;
-    curN += diffWeight * diffN + deltaN * deltaWeightN;
+    curS += diffWeightSD * diffS + deltaS * deltaWeightS;
+    curD += diffWeightSD * diffD + deltaD * deltaWeightD;
+    curN += diffWeightN * diffN + deltaN * deltaWeightN;
     
     clara->serotoninLevel = fmin(fmax(curS, 0.0), 1.0);
     clara->dopamineLevel = fmin(fmax(curD, 0.0), 1.0);

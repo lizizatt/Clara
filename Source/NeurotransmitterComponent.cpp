@@ -55,9 +55,20 @@ void NeurotransmitterComponent::paint (Graphics& g)
     posX += (dopamine * dopaXScale);
     posY -= (dopamine * dopaYScale);
     
-    g.setColour(Colours::cyan);
-    int circleSize = (dopamine * .5 + .5) * 12;
+    
+    Colour r = Colours::red;
+    Colour gre = Colours::green;
+    Colour b = Colours::blue;
+    //todo rgb coloring of dot (plus alpha)
+    
+    g.setColour(Colours::cyan.withAlpha((float) fmax(.5, dopamineChart.getCurrent())));
+    
+    Colour emotionalColor = Colour::fromFloatRGBA(noraldrenalineChart.getCurrent(), serotoninChart.getCurrent(), dopamineChart.getCurrent(), 1.0);
+    int circleSize = 12;
+    g.setColour(Colours::white);
     g.fillEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
+    g.setColour(emotionalColor);
+    g.fillEllipse(posX - circleSize / 2 + 1, posY - circleSize / 2 + 1, circleSize - 2, circleSize - 2);
 }
 
 void NeurotransmitterComponent::resized()

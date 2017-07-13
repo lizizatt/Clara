@@ -36,7 +36,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/imperialguard.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/bangarang.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
