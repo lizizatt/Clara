@@ -193,8 +193,8 @@ void Clara::MusicHormoneNode::tick()
     
     static float avgLoudness = 1;
     
-    clara->deltaSerotonin += majorWeight - minorWeight;
-    clara->deltaDopamine += majorWeight - minorWeight;
+    clara->deltaSerotonin += majorWeight;
+    clara->deltaDopamine += minorWeight;
     clara->deltaNoradrenaline += loudness - avgLoudness;
 }
 
@@ -222,7 +222,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     float diffN = .5 - curN;
     float diffWeight = .1;
     
-    static float deltaOverallWeight = .002;
+    static float deltaOverallWeight = .005;
     float deltaWeightS = fabs(deltaS) / fabs(prevDS) * deltaOverallWeight;
     float deltaWeightD = fabs(deltaD) / fabs(prevDD) * deltaOverallWeight;
     float deltaWeightN = fabs(deltaN) / fabs(prevDN) * deltaOverallWeight;

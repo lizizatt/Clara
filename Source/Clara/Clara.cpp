@@ -36,7 +36,7 @@ void Clara::setUpNodes()
 void Clara::run()
 {
 	DBG("Loading file");
-	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/allstarchorale.mp3"));
+	FileInputStream *stream = new FileInputStream(File("~/Clara/Resources/longtest.mp3"));
 
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -99,8 +99,8 @@ void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)
 void Clara::notifyNeurotransmitters()
 {
     serotoninLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
-    dopamineLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
-    noradrenalineLevel = fmax(fmin(serotoninLevel, 1.0), 0.0);
+    dopamineLevel = fmax(fmin(dopamineLevel, 1.0), 0.0);
+    noradrenalineLevel = fmax(fmin(noradrenalineLevel, 1.0), 0.0);
     
     postMessage(new Clara::SerotoninUpdateMessage(serotoninLevel));
     postMessage(new Clara::DopamineUpdateMessage(dopamineLevel));
