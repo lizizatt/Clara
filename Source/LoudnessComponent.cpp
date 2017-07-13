@@ -13,10 +13,11 @@
 
 //==============================================================================
 LoudnessComponent::LoudnessComponent(Clara *clara)
-: clara(clara), loudnessChart("Loudness", Colours::red, MAX_LOOKBACK)
+: clara(clara), loudnessChart("Loudness", Colours::red, MAX_LOOKBACK), repetitivenessChart("Repetitivensss", Colours::orange, MAX_LOOKBACK)
 {
     clara->addListener(this);
     addAndMakeVisible(loudnessChart);
+    addAndMakeVisible(repetitivenessChart);
 }
 
 LoudnessComponent::~LoudnessComponent()
@@ -32,7 +33,9 @@ void LoudnessComponent::paint (Graphics& g)
 
 void LoudnessComponent::resized()
 {
-    loudnessChart.setBounds(20, 20, getWidth() - 40, getHeight() - 40);
+    int h = (getHeight() - 50) / 2;
+    loudnessChart.setBounds(20, 20, getWidth() - 40, h);
+    repetitivenessChart.setBounds(20, getHeight() / 2.0 + 5, getWidth() - 40, h);
 }
 
 void LoudnessComponent::handleMessage(const Message &m)
@@ -42,5 +45,10 @@ void LoudnessComponent::handleMessage(const Message &m)
     Clara::LoudnessMetric::LoudnessMetricOutput* loudnessOut = dynamic_cast<Clara::LoudnessMetric::LoudnessMetricOutput*>(msg);
     if (loudnessOut != nullptr) {
         loudnessChart.addItem(loudnessOut->loudness);
+    }
+
+    Clara::RepetitivenessNode::RepetitivenessNodeOutput* repetOut = dynamic_cast<Clara::RepetitivenessNode::RepetitivenessNodeOutput*>(msg);
+    if (repetOut != nullptr) {
+        repetitivenessChart.addItem(repetOut->repetitiveness);
     }
 }

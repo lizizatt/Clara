@@ -42,6 +42,7 @@ private:
     Label upNextLabel;
     Label upNextValue;
     
+    Label memoryLabel;
     TableListBox memoryListBox;
     TextButton addSong;
     

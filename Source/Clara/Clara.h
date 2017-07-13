@@ -169,6 +169,25 @@ public:
         Array<float> intervalPresenceWeights;
 	};
     
+    class RepetitivenessNode : public Node
+    {
+    public:
+        class RepetitivenessNodeOutput : public Message
+        {
+        public:
+            float repetitiveness;
+            RepetitivenessNodeOutput(float repetitiveness) : repetitiveness(repetitiveness) {}
+        };
+    public:
+        RepetitivenessNode(Clara *clara) : clara(clara) {}
+        void tick() override;
+    public:
+        Clara *clara = nullptr;
+    public:
+        float repetitiveness = 0;
+        Array<float*> prevFFTs;
+    };
+    
     class MusicHormoneNode : public Node
     {
     public:
@@ -216,10 +235,12 @@ private:
     void playSong(Song *song);
     void loadMemory();
     File getMemoryFolder();
+    void runFFT();
     
 private:
     ScopedPointer<LoudnessMetric> loudnessMetricNode;
     ScopedPointer<IntervalGenerator> intervalGeneratorNode;
+    ScopedPointer<RepetitivenessNode> repetitivenessNode;
     ScopedPointer<MusicHormoneNode> musicHormoneNode;
     ScopedPointer<NeurotransmitterManagerNode> neurotransmitterManagerNode;
     
@@ -247,6 +268,7 @@ private:
 	CriticalSection audioBufferSection;
     bool readyToPlayAudio = false;
     ScopedPointer<AudioSampleBuffer> myBuffer;
+    FFT::Complex* outputFromFFT = nullptr;
     bool stopSongFlag = false;
     
     Song* currentlyPlaying = nullptr;

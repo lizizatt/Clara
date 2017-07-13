@@ -74,8 +74,10 @@ Clara::~Clara()
 
 void Clara::setUpNodes()
 {
+    //these will run in order of initialization
     intervalGeneratorNode = new IntervalGenerator(this);
     loudnessMetricNode = new LoudnessMetric(this);
+    repetitivenessNode = new RepetitivenessNode(this);
     musicHormoneNode = new MusicHormoneNode(this);
     neurotransmitterManagerNode = new NeurotransmitterManagerNode(this);
 }
@@ -203,7 +205,7 @@ void Clara::playSong(Song *toPlay)
     postMessage(new PlaybackStateChanged());
     //run
     DBG("Running");
-    for (int i = 0; !stopSongFlag && !threadShouldExit(); i++) {
+    for (int i = 0; !stopSongFlag && !threadShouldExit() && pts < reader->lengthInSamples; i++) {
         //grab audio and run nodes to process it
         
         if (true) {
@@ -216,6 +218,8 @@ void Clara::playSong(Song *toPlay)
             pts += stride;
             numSamples = stride;
         }
+        
+        runFFT();
         
         Node::runAllNodes();
         
@@ -251,8 +255,38 @@ void Clara::playSong(Song *toPlay)
     
     currentlyPlaying = nullptr;
     
+    if (outputFromFFT != nullptr) {
+        delete outputFromFFT;
+        outputFromFFT = nullptr;
+    }
+    
     postMessage(new MemoryChanged());
     postMessage(new PlaybackStateChanged());
+}
+
+void Clara::runFFT()
+{
+    FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * myBuffer->getNumSamples());
+    if (outputFromFFT != nullptr) {
+        delete outputFromFFT;
+    }
+    outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * myBuffer->getNumSamples());
+    
+    FFT fft(9, false);
+    
+    for (int c = 0; c < myBuffer->getNumChannels(); c++) {
+        for (int i = 0; i < myBuffer->getNumSamples(); i++) {
+            if (c == 0) {
+                inputToFFT[i].r = 0;
+                inputToFFT[i].i = 0;
+            }
+            inputToFFT[i].r += myBuffer->getSample(c, i);
+        }
+    }
+    
+    fft.perform(inputToFFT, outputFromFFT);
+    
+    delete inputToFFT;
 }
 
 void Clara::getNextAudioBlock(const juce::AudioSourceChannelInfo &outputBuffer)

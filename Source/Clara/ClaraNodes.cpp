@@ -38,22 +38,7 @@ void Clara::IntervalGenerator::tick()
     intervals.clear();
     intervalPresenceWeights.clear();
     
-    FFT::Complex* inputToFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * clara->myBuffer->getNumSamples());
-    FFT::Complex* outputFromFFT = (FFT::Complex*)malloc(sizeof(FFT::Complex) * clara->myBuffer->getNumSamples());
-    
-    FFT fft(9, false);
-    
-    for (int c = 0; c < clara->myBuffer->getNumChannels(); c++) {
-        for (int i = 0; i < clara->myBuffer->getNumSamples(); i++) {
-            if (c == 0) {
-                inputToFFT[i].r = 0;
-                inputToFFT[i].i = 0;
-            }
-            inputToFFT[i].r += clara->myBuffer->getSample(c, i);
-        }
-    }
-    
-    fft.perform(inputToFFT, outputFromFFT);
+    FFT::Complex* outputFromFFT = clara->outputFromFFT;
     
     Array<float> frequencyCounts;
     
@@ -101,9 +86,6 @@ void Clara::IntervalGenerator::tick()
     if (tickCount % JUMP_COUNT == 0) {
         clara->postMessage(new Clara::IntervalGenerator::IntervalGeneratorOutput(intervals, intervalPresenceWeights, root));
     }
-        
-    delete inputToFFT;
-    delete outputFromFFT;
 }
 
 void Clara::LoudnessMetric::tick()
@@ -128,6 +110,69 @@ void Clara::LoudnessMetric::tick()
     
     if (tickCount % JUMP_COUNT == 0) {
         clara->postMessage(new Clara::LoudnessMetric::LoudnessMetricOutput(loudness));
+    }
+}
+
+void Clara::RepetitivenessNode::tick()
+{
+    //take fft
+    FFT::Complex* outputFromFFT = clara->outputFromFFT;
+    
+    if (outputFromFFT == nullptr) {
+        return;
+    }
+    
+    //downsample the FFT
+    int lookbackSize = 50;
+    float *downresFFT = (float*) malloc(sizeof(float) * lookbackSize);
+    for (int i = 0 ; i < lookbackSize; i++) {
+        downresFFT[i] = 0.0;
+    }
+    for (int i = 0; i < clara->myBuffer->getNumSamples(); i++) {
+        int binIndex = clara->myBuffer->getNumSamples() / (float) lookbackSize;
+        downresFFT[binIndex] = downresFFT[binIndex] + sqrt(pow(outputFromFFT[i].r, 2) + pow(outputFromFFT[i].i, 2));
+    }
+    for (int i = 0 ; i < lookbackSize; i++) {
+        downresFFT[i] = downresFFT[i] / ((float) clara->myBuffer->getNumSamples() / (float) lookbackSize);
+    }
+    
+    prevFFTs.add(downresFFT);
+    if (prevFFTs.size() > 860 /*this is ~10 seconds worth of samples*/) {
+        delete prevFFTs[0];
+        prevFFTs.remove(0);
+        
+        
+        //we now have an array of downsample FFTs
+        //repetitiveness will be the average 1 / variance
+        repetitiveness = 0;
+        for (int i = 0; i < lookbackSize; i++) {
+            //determine mean for this sample over time
+            float mean = 0;
+            for (int j = 0; j < prevFFTs.size(); j++) {
+                float* curFFT = prevFFTs[j];
+                mean += curFFT[i];
+            }
+            mean = mean / (float) prevFFTs.size();
+            
+            //determine variance for this sample over time
+            float variance = 0;
+            for (int j = 0; j < prevFFTs.size(); j++) {
+                float* curFFT = prevFFTs[j];
+                variance += pow(mean - curFFT[i], 2);
+            }
+            variance = variance / (float) prevFFTs.size();
+            
+            repetitiveness += variance;
+        }
+        repetitiveness = repetitiveness / (float) lookbackSize;
+        repetitiveness = 1.0 / repetitiveness;
+    }
+    else {
+        repetitiveness = .2;
+    }
+    
+    if (tickCount % JUMP_COUNT == 0) {
+        clara->postMessage(new Clara::RepetitivenessNode::RepetitivenessNodeOutput(repetitiveness));
     }
 }
 
@@ -191,12 +236,23 @@ void Clara::MusicHormoneNode::tick()
         }
     }
     
+    const float loudnessWeight = 1.0;
     static float avgLoudness = 1;
     avgLoudness = avgLoudness * .9 + loudness * .1;
+    float loudnessContribution = loudness - avgLoudness;
+    loudnessContribution *= loudnessWeight;
+    
+    float repetitivenessWeight = .0025;
+    float thresh = .15;
+    float repetitiveness = clara->repetitivenessNode->repetitiveness;
+    float repetitivenessContribution = 1.0 / clara->repetitivenessNode->repetitiveness * repetitivenessWeight;
+    repetitivenessContribution *= repetitiveness > thresh? -1 : 1;
+    
+    //DBG(String::formatted("Loudness %f, repetitiveness %f", loudnessContribution, repetitivenessContribution));
     
     clara->deltaSerotonin += majorWeight;
     clara->deltaDopamine += minorWeight;
-    clara->deltaNoradrenaline += loudness - avgLoudness;
+    clara->deltaNoradrenaline += loudnessContribution + repetitivenessContribution;
 }
 
 Clara::NeurotransmitterManagerNode::NeurotransmitterManagerNode(Clara *clara)

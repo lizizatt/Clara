@@ -10,6 +10,10 @@
       <FILE id="Qz9HxS" name="ClaraNodes.cpp" compile="1" resource="0" file="Source/Clara/ClaraNodes.cpp"/>
     </GROUP>
     <GROUP id="{28307E5F-D034-757B-7777-567BD5E5616D}" name="Source">
+      <FILE id="anyjz2" name="ThoughtsComponent.cpp" compile="1" resource="0"
+            file="Source/ThoughtsComponent.cpp"/>
+      <FILE id="bAfhGh" name="ThoughtsComponent.h" compile="0" resource="0"
+            file="Source/ThoughtsComponent.h"/>
       <FILE id="iQrr7D" name="NowPlayingComponent.cpp" compile="1" resource="0"
             file="Source/NowPlayingComponent.cpp"/>
       <FILE id="yLoZyp" name="NowPlayingComponent.h" compile="0" resource="0"
