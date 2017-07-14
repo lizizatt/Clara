@@ -129,7 +129,14 @@ void NowPlayingComponent::buttonClicked(Button *b)
     }
     
     if (b == &addSong) {
-        //todo add file browser
+        FileChooser myChooser ("Please select the music you want to give Clara...",
+                               File::getSpecialLocation (File::userHomeDirectory),
+                               "*.mp3");
+        if (myChooser.browseForFileToOpen())
+        {
+            File mp3File (myChooser.getResult());
+            clara->addSongToMemory(mp3File);
+        }
     }
     
     if (b->getName().startsWith("TB")) {

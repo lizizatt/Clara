@@ -121,7 +121,9 @@ void Clara::pickNextSong()
         }
         options.add(memory[i]);
     }
-    upNext = options[rand() % options.size()];
+    if (options.size() > 0) {
+        upNext = options[rand() % options.size()];
+    }
 }
 
 Array<Clara::Song*> Clara::getMemory()
