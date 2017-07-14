@@ -9,6 +9,7 @@
 */
 
 #include "NowPlayingComponent.h"
+#include "MainComponent.h"
 
 NowPlayingComponent::NowPlayingComponent(Clara *clara)
 : clara(clara)
@@ -26,6 +27,13 @@ NowPlayingComponent::NowPlayingComponent(Clara *clara)
     stopButton.setColour(TextButton::ColourIds::textColourOffId, Colours::lightgrey);
     stopButton.addListener(this);
     
+    toggleMute.setButtonText("Mute");
+    toggleMute.setColour(TextButton::ColourIds::buttonColourId, Colours::darkgrey);
+    toggleMute.setColour(TextButton::ColourIds::buttonOnColourId, Colours::grey);
+    toggleMute.setColour(TextButton::ColourIds::textColourOnId, Colours::white);
+    toggleMute.setColour(TextButton::ColourIds::textColourOffId, Colours::lightgrey);
+    toggleMute.addListener(this);
+    
     upNextLabel.setColour(Label::ColourIds::textColourId, Colours::lightgrey);
     upNextLabel.setText("Up next:", dontSendNotification);
     
@@ -39,6 +47,7 @@ NowPlayingComponent::NowPlayingComponent(Clara *clara)
     memoryListBox.getHeader().addColumn("Song", 1, 150);
     memoryListBox.getHeader().addColumn("Score", 2, 70);
     memoryListBox.getHeader().addColumn("", 3, 40);
+    memoryListBox.getHeader().addColumn("", 4, 40);
     memoryListBox.setHeaderHeight(0.0);
     memoryListBox.setColour(TableListBox::ColourIds::backgroundColourId, Colours::black);
     memoryListBox.setColour(TableListBox::ColourIds::outlineColourId, Colours::darkgrey);
@@ -57,6 +66,7 @@ NowPlayingComponent::NowPlayingComponent(Clara *clara)
     addAndMakeVisible(currentlyListeningToValue);
     addAndMakeVisible(upNextLabel);
     addAndMakeVisible(upNextValue);
+    addAndMakeVisible(toggleMute);
     addAndMakeVisible(stopButton);
     addAndMakeVisible(memoryListBox);
     addAndMakeVisible(addSong);
@@ -82,6 +92,7 @@ void NowPlayingComponent::resized()
     currentlyListeningToLabel.setBounds(20, 20, getWidth() - 40, 20);
     currentlyListeningToValue.setBounds(currentlyListeningToLabel.getX() + 20, currentlyListeningToLabel.getBottom() + 5, getWidth() - 60, 20);
     stopButton.setBounds(currentlyListeningToValue.getX(), currentlyListeningToValue.getBottom() + 5, 100, 20);
+    toggleMute.setBounds(stopButton.getRight() + 10, stopButton.getY(), 100, 20);
     
     upNextLabel.setBounds(20, stopButton.getBottom() + 20, getWidth() - 40, 20);
     upNextValue.setBounds(upNextLabel.getX() + 20, upNextLabel.getBottom() + 5, getWidth() - 60, 20);
@@ -146,6 +157,19 @@ void NowPlayingComponent::buttonClicked(Button *b)
             clara->stopSong();
         }
     }
+    
+    if (b->getName().startsWith("RM")) {
+        int num = b->getName().fromFirstOccurrenceOf("RM", false, false).getIntValue();
+        if (num >= 0 && num < memory.size()) {
+            clara->removeSong(memory[num]);
+        }
+    }
+    
+    if (b == &toggleMute) {
+        MainContentComponent *mc = findParentComponentOfClass<MainContentComponent>();
+        mc->mute = !mc->mute;
+        toggleMute.setButtonText(mc->mute? "Unmute" : "Mute");
+    }
 }
 
 int NowPlayingComponent::getNumRows()
@@ -186,6 +210,18 @@ Component *NowPlayingComponent::refreshComponentForCell(int row, int col, bool s
         tb->setColour(TextButton::ColourIds::textColourOnId, Colours::white);
         tb->setColour(TextButton::ColourIds::textColourOffId, Colours::lightgrey);
         return tb;
+    }
+    if (col == 4) {
+        if (clara->getCurrentlyPlaying() != memory[row] && clara->getUpNext() != memory[row]) {
+            TextButton *tb = new TextButton(String::formatted("RM%d", row));
+            tb->setButtonText("Rm");
+            tb->addListener(this);
+            tb->setColour(TextButton::ColourIds::buttonColourId, Colours::darkgrey);
+            tb->setColour(TextButton::ColourIds::buttonOnColourId, Colours::grey);
+            tb->setColour(TextButton::ColourIds::textColourOnId, Colours::white);
+            tb->setColour(TextButton::ColourIds::textColourOffId, Colours::lightgrey);
+            return tb;
+        }
     }
     return new Label();
 }

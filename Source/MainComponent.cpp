@@ -65,7 +65,9 @@ void MainContentComponent::prepareToPlay(int samplesPerBlock, double sampleRate)
 
 void MainContentComponent::getNextAudioBlock(const AudioSourceChannelInfo &buffer)
 {
-    clara->getNextAudioBlock(buffer);
+    if (!mute) {
+        clara->getNextAudioBlock(buffer);
+    }
 }
 
 void MainContentComponent::handleMessage(const Message &m)

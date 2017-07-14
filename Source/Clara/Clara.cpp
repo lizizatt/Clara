@@ -140,6 +140,18 @@ Clara::Song* Clara::getUpNext()
     return upNext;
 }
 
+void Clara::removeSong(Clara::Song* toRemove)
+{
+    if (toRemove != nullptr && toRemove != currentlyPlaying && toRemove != upNext) {
+        toRemove->songFile.deleteFile();
+        if (toRemove->metaFile.existsAsFile()) {
+            toRemove->metaFile.deleteFile();
+        }
+        memory.remove(memory.indexOf(toRemove));
+        postMessage(new MemoryChanged());
+    }
+}
+
 File Clara::getMemoryFolder()
 {
     File toRet = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory).getChildFile("Clara").getChildFile("Memory");

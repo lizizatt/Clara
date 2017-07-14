@@ -204,6 +204,7 @@ Clara::MusicHormoneNode::MusicHormoneNode(Clara *clara)
     //minor 3rd
     minorLearnedWeights.set(0, 1);
     minorLearnedWeights.set(3, 5);
+    minorLearnedWeights.set(4, -2);
     minorLearnedWeights.set(7, 1);
 }
 
@@ -264,8 +265,8 @@ void Clara::MusicHormoneNode::tick()
     
     //DBG(String::formatted("Loudness %f, repetitiveness %f", loudnessContribution, repetitivenessContribution));
     
-    clara->deltaSerotonin += majorWeight;
-    clara->deltaDopamine += minorWeight;
+    clara->deltaSerotonin += minorWeight;
+    clara->deltaDopamine += majorWeight;
     clara->deltaNoradrenaline += loudnessContribution + repetitivenessContribution;
 }
 

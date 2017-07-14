@@ -35,7 +35,9 @@ public:
     void handleMessage(const Message &m) override;
 
 	void timerCallback() override;
-
+    
+    bool mute = false;
+    
 private:
     ScopedPointer<IntervalScoreComponent> intervalScoreComponent;
     ScopedPointer<LoudnessComponent> loudnessComponent;
@@ -48,6 +50,7 @@ private:
     float avgS;
     float avgD;
     float avgN;
+    
     
 	Clara *clara = nullptr;
     //==============================================================================

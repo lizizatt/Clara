@@ -39,6 +39,7 @@ private:
     Label currentlyListeningToLabel;
     Label currentlyListeningToValue;
     TextButton stopButton;
+    TextButton toggleMute;
     Label upNextLabel;
     Label upNextValue;
     

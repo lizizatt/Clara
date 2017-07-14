@@ -229,6 +229,7 @@ public:
     Song* getCurrentlyPlaying();
     Song* getUpNext();
     void setUpNext(Song* toPlay);
+    void removeSong(Song* toRemove);
     
 private:
     void pickNextSong();
