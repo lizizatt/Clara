@@ -28,6 +28,8 @@ public:
     void resized();
     void pickEmoji();
     
+    void mouseUp(const MouseEvent &me) override;
+    
     void handleMessage(const Message &m) override;
 
 private:
@@ -50,6 +52,8 @@ private:
     Image contempt;
     Image surprise;
     Image neutral;
+    
+    bool showCube = true;
 };
 
 

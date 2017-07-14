@@ -34,6 +34,8 @@ NeurotransmitterComponent::NeurotransmitterComponent(Clara *clara)
     emojiComponent.setImage(neutral);
     
     cubeImage = ImageCache::getFromMemory(BinaryData::thecube_png, BinaryData::thecube_pngSize);
+    
+    addMouseListener(this, true);
 }
 
 NeurotransmitterComponent::~NeurotransmitterComponent()
@@ -49,7 +51,6 @@ void NeurotransmitterComponent::paint (Graphics& g)
     int start = noraldrenalineChart.getBottom() + 20;
     Rectangle<int> space(0, start, getWidth(), getHeight() - start);
     
-    g.drawImage(cubeImage, space.getX(), space.getY(), space.getWidth(), space.getHeight(), 0, 0, cubeImage.getWidth(), cubeImage.getHeight());
     
     float originX = space.getWidth() * .2 + space.getX();
     float originY = space.getHeight() * .9 + space.getY();
@@ -68,19 +69,23 @@ void NeurotransmitterComponent::paint (Graphics& g)
     posY -= (dopamine * dopaYScale);
     
     
-    Colour r = Colours::red;
-    Colour gre = Colours::green;
-    Colour b = Colours::blue;
-    //todo rgb coloring of dot (plus alpha)
-    
-    g.setColour(Colours::cyan.withAlpha((float) fmax(.5, dopamineChart.getCurrent())));
-    
-    Colour emotionalColor = Colour::fromFloatRGBA(noraldrenalineChart.getCurrent(), serotoninChart.getCurrent(), dopamineChart.getCurrent(), 1.0);
-    int circleSize = 12;
-    g.setColour(Colours::white);
-    g.fillEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
-    g.setColour(emotionalColor);
-    g.fillEllipse(posX - circleSize / 2 + 1, posY - circleSize / 2 + 1, circleSize - 2, circleSize - 2);
+    if (showCube) {
+        g.drawImage(cubeImage, space.getX(), space.getY(), space.getWidth(), space.getHeight(), 0, 0, cubeImage.getWidth(), cubeImage.getHeight());
+        
+        Colour r = Colours::red;
+        Colour gre = Colours::green;
+        Colour b = Colours::blue;
+        //todo rgb coloring of dot (plus alpha)
+        
+        g.setColour(Colours::cyan.withAlpha((float) fmax(.5, dopamineChart.getCurrent())));
+        
+        Colour emotionalColor = Colour::fromFloatRGBA(noraldrenalineChart.getCurrent(), serotoninChart.getCurrent(), dopamineChart.getCurrent(), 1.0);
+        int circleSize = 12;
+        g.setColour(Colours::white);
+        g.fillEllipse(posX - circleSize / 2, posY - circleSize / 2, circleSize, circleSize);
+        g.setColour(emotionalColor);
+        g.fillEllipse(posX - circleSize / 2 + 1, posY - circleSize / 2 + 1, circleSize - 2, circleSize - 2);
+    }
 }
 
 void NeurotransmitterComponent::resized()
@@ -89,7 +94,19 @@ void NeurotransmitterComponent::resized()
     serotoninChart.setBounds(20, 20, getWidth() - 40, h);
     dopamineChart.setBounds(20, serotoninChart.getBottom() + 20, getWidth() - 40, h);
     noraldrenalineChart.setBounds(20, dopamineChart.getBottom() + 20, getWidth() - 40, h);
-    emojiComponent.setBounds(20, noraldrenalineChart.getBottom() + 20, 30, 30);
+    if (showCube) {
+        emojiComponent.setBounds(20, noraldrenalineChart.getBottom() + 20, 30, 30);
+    }
+    else {
+        emojiComponent.setBounds(20, noraldrenalineChart.getBottom() + 20, getWidth() - 40, getWidth() - 40);
+    }
+}
+
+void NeurotransmitterComponent::mouseUp(const MouseEvent &me)
+{
+    showCube = !showCube;
+    repaint();
+    resized();
 }
 
 void NeurotransmitterComponent::pickEmoji()
