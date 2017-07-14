@@ -13,7 +13,7 @@
 
 //==============================================================================
 LoudnessComponent::LoudnessComponent(Clara *clara)
-: clara(clara), loudnessChart("Loudness", Colours::red, MAX_LOOKBACK), repetitivenessChart("Repetitivensss", Colours::orange, MAX_LOOKBACK)
+: clara(clara), loudnessChart("Loudness", Colours::red, MAX_LOOKBACK, true), repetitivenessChart("Repetitivensss", Colours::orange, MAX_LOOKBACK, true)
 {
     clara->addListener(this);
     addAndMakeVisible(loudnessChart);

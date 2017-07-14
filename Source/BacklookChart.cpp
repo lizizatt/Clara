@@ -61,6 +61,8 @@ void BacklookChart::resized()
 
 void BacklookChart::addItem(float newItem)
 {
+    newItem = unitRange? fmax(fmin(1.0, newItem), 0.0) : newItem;
+    
     items.add(newItem);
     if (items.size() > maxSize) {
         items.remove(0);

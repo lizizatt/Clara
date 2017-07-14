@@ -115,6 +115,7 @@ void Clara::LoudnessMetric::tick()
 
 void Clara::RepetitivenessNode::tick()
 {
+    
     //take fft
     FFT::Complex* outputFromFFT = clara->outputFromFFT;
     
@@ -123,52 +124,63 @@ void Clara::RepetitivenessNode::tick()
     }
     
     //downsample the FFT
-    int lookbackSize = 50;
-    float *downresFFT = (float*) malloc(sizeof(float) * lookbackSize);
-    for (int i = 0 ; i < lookbackSize; i++) {
+    int downresSize = 50;
+    float *downresFFT = (float*) malloc(sizeof(float) * downresSize);
+    for (int i = 0 ; i < downresSize; i++) {
         downresFFT[i] = 0.0;
     }
     for (int i = 0; i < clara->myBuffer->getNumSamples(); i++) {
-        int binIndex = clara->myBuffer->getNumSamples() / (float) lookbackSize;
+        int binIndex = clara->myBuffer->getNumSamples() / (float) downresSize;
         downresFFT[binIndex] = downresFFT[binIndex] + sqrt(pow(outputFromFFT[i].r, 2) + pow(outputFromFFT[i].i, 2));
     }
-    for (int i = 0 ; i < lookbackSize; i++) {
-        downresFFT[i] = downresFFT[i] / ((float) clara->myBuffer->getNumSamples() / (float) lookbackSize);
+    for (int i = 0 ; i < downresSize; i++) {
+        downresFFT[i] = downresFFT[i] / ((float) clara->myBuffer->getNumSamples() / (float) downresSize);
     }
     
-    prevFFTs.add(downresFFT);
-    if (prevFFTs.size() > 860 /*this is ~10 seconds worth of samples*/) {
-        delete prevFFTs[0];
-        prevFFTs.remove(0);
-        
-        
-        //we now have an array of downsample FFTs
-        //repetitiveness will be the average 1 / variance
-        repetitiveness = 0;
-        for (int i = 0; i < lookbackSize; i++) {
-            //determine mean for this sample over time
-            float mean = 0;
-            for (int j = 0; j < prevFFTs.size(); j++) {
-                float* curFFT = prevFFTs[j];
-                mean += curFFT[i];
-            }
-            mean = mean / (float) prevFFTs.size();
+    if (tickCount % 10 == 0 || prevFFTs.size() < 100) {
+        //this is the one we generate a new repetitiveness value
+        prevFFTs.add(downresFFT);
+        if (prevFFTs.size() > 100 && tickCount % 10 == 0) { //this results in about ~10 seconds memory
+            delete prevFFTs[0];
+            prevFFTs.remove(0);
             
-            //determine variance for this sample over time
-            float variance = 0;
-            for (int j = 0; j < prevFFTs.size(); j++) {
-                float* curFFT = prevFFTs[j];
-                variance += pow(mean - curFFT[i], 2);
-            }
-            variance = variance / (float) prevFFTs.size();
             
-            repetitiveness += variance;
+            //we now have an array of downsample FFTs
+            //repetitiveness will be the average 1 / variance
+            repetitiveness = 0;
+            for (int i = 0; i < downresSize; i++) {
+                //determine mean for this sample over time
+                float mean = 0;
+                for (int j = 0; j < prevFFTs.size(); j++) {
+                    float* curFFT = prevFFTs[j];
+                    mean += curFFT[i];
+                }
+                mean = mean / (float) prevFFTs.size();
+                
+                //determine variance for this sample over time
+                float variance = 0;
+                for (int j = 0; j < prevFFTs.size(); j++) {
+                    float* curFFT = prevFFTs[j];
+                    variance += pow(mean - curFFT[i], 2);
+                }
+                variance = variance / (float) prevFFTs.size();
+                
+                repetitiveness += variance;
+            }
+            repetitiveness = repetitiveness / (float) downresSize;
+            repetitiveness = sqrt(1.0 / repetitiveness);
         }
-        repetitiveness = repetitiveness / (float) lookbackSize;
-        repetitiveness = 1.0 / repetitiveness;
+        else {
+            repetitiveness = .2;
+        }
     }
     else {
-        repetitiveness = .2;
+        //this is the one we collate samples into latest summary
+        float* contr = prevFFTs[prevFFTs.size() - 1];
+        for (int i = 0; i < downresSize; i++) {
+            contr[i] = contr[i] * .9 + downresFFT[i] * .1;
+        };
+        delete downresFFT;
     }
     
     if (tickCount % JUMP_COUNT == 0) {
@@ -208,7 +220,8 @@ void Clara::MusicHormoneNode::tick()
         majorWeight += majorLearnedWeights[i] * weights[i];
     }
     
-    float dynamicLearningThreshold = .99;
+    /*
+    float dynamicLearningThreshold = .9999;
     while ((double) rand() / (double) INT_MAX > dynamicLearningThreshold) {
         
         float max = 0;
@@ -235,6 +248,7 @@ void Clara::MusicHormoneNode::tick()
             DBG(String::formatted("Minor neuron %d mutated to new value %.2f", item, minorLearnedWeights[item]));
         }
     }
+     */
     
     const float loudnessWeight = 1.0;
     static float avgLoudness = 1;
@@ -243,7 +257,7 @@ void Clara::MusicHormoneNode::tick()
     loudnessContribution *= loudnessWeight;
     
     float repetitivenessWeight = .0025;
-    float thresh = .15;
+    float thresh = .3;
     float repetitiveness = clara->repetitivenessNode->repetitiveness;
     float repetitivenessContribution = 1.0 / clara->repetitivenessNode->repetitiveness * repetitivenessWeight;
     repetitivenessContribution *= repetitiveness > thresh? -1 : 1;
@@ -279,7 +293,7 @@ void Clara::NeurotransmitterManagerNode::tick()
     float diffD = centerline - curD;
     float diffN = centerline - curN;
     float diffWeightSD = .1;
-    float diffWeightN = .01;
+    float diffWeightN = .03;
     
     static float deltaOverallWeightSD = .01;
     static float deltaOverallWeightN = .01;
