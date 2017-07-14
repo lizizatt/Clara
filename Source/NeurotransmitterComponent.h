@@ -26,6 +26,7 @@ public:
 
     void paint (Graphics&);
     void resized();
+    void pickEmoji();
     
     void handleMessage(const Message &m) override;
 
@@ -38,6 +39,17 @@ private:
 
     Image cubeImage;
     Clara *clara;
+    
+    ImageComponent emojiComponent;
+    Image anger;
+    Image excitement;
+    Image joy;
+    Image fear;
+    Image distress;
+    Image shame;
+    Image contempt;
+    Image surprise;
+    Image neutral;
 };
 
 

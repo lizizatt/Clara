@@ -48,9 +48,9 @@ void MainContentComponent::resized()
     nowPlayingComponent->setBounds(20, 20, leftCol, getHeight() - 40);
     
     Rectangle<int> mainPane(40 + leftCol, 20, getWidth() - 60 - leftCol, getHeight() - 40);
-    intervalScoreComponent->setBounds(mainPane.getX() + 20, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() * 3.0 / 4.0 - 20 - 5);
-    loudnessComponent->setBounds(mainPane.getX() + 20, intervalScoreComponent->getBottom() + 10, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() / 4.0 - 20 - 5);
-    neuroComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() - 40);
+    intervalScoreComponent->setBounds(mainPane.getX() + 20, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() * 3.0 / 4.0 - 5);
+    loudnessComponent->setBounds(mainPane.getX() + 20, intervalScoreComponent->getBottom() + 10, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight() / 4.0 - 5);
+    neuroComponent->setBounds(intervalScoreComponent->getRight() + 10, 20, mainPane.getWidth() / 2.0 - 20 - 5, mainPane.getHeight());
 }
 
 void MainContentComponent::timerCallback()

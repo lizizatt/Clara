@@ -49,6 +49,7 @@ private:
     Array<Clara::Song*> memory;
     
     Clara *clara;
+    
 };
 
 

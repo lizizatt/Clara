@@ -21,6 +21,18 @@ NeurotransmitterComponent::NeurotransmitterComponent(Clara *clara)
     addAndMakeVisible(noraldrenalineChart);
     addAndMakeVisible(dopamineChart);
     
+    anger = ImageCache::getFromMemory(BinaryData::anger_png, BinaryData::anger_pngSize);
+    excitement = ImageCache::getFromMemory(BinaryData::excitement_png, BinaryData::excitement_pngSize);
+    joy = ImageCache::getFromMemory(BinaryData::joy_png, BinaryData::joy_pngSize);
+    fear = ImageCache::getFromMemory(BinaryData::scared_png, BinaryData::scared_pngSize);
+    shame = ImageCache::getFromMemory(BinaryData::shame_png, BinaryData::shame_pngSize);
+    distress = ImageCache::getFromMemory(BinaryData::distress_png, BinaryData::distress_pngSize);
+    contempt = ImageCache::getFromMemory(BinaryData::disgust_png, BinaryData::disgust_pngSize);
+    surprise = ImageCache::getFromMemory(BinaryData::surprised_png, BinaryData::surprised_pngSize);
+    neutral = ImageCache::getFromMemory(BinaryData::neutral_png, BinaryData::neutral_pngSize);
+    addAndMakeVisible(emojiComponent);
+    emojiComponent.setImage(neutral);
+    
     cubeImage = ImageCache::getFromMemory(BinaryData::thecube_png, BinaryData::thecube_pngSize);
 }
 
@@ -77,25 +89,85 @@ void NeurotransmitterComponent::resized()
     serotoninChart.setBounds(20, 20, getWidth() - 40, h);
     dopamineChart.setBounds(20, serotoninChart.getBottom() + 20, getWidth() - 40, h);
     noraldrenalineChart.setBounds(20, dopamineChart.getBottom() + 20, getWidth() - 40, h);
+    emojiComponent.setBounds(20, noraldrenalineChart.getBottom() + 20, 30, 30);
+}
+
+void NeurotransmitterComponent::pickEmoji()
+{
+    float s = serotoninChart.getCurrent();
+    float d = dopamineChart.getCurrent();
+    float n = noraldrenalineChart.getCurrent();
+    
+    Image pick;
+    if (.6 > s && s > .4
+        && .6 > d && d > .4
+        && .5 > n && n > .15) {
+        pick = neutral;
+    }
+    else if (s > .5) {
+        if (d > .5) {
+            if (n > .5) {
+                pick = excitement;
+            }
+            else {
+                pick = joy;
+            }
+        }
+        else {
+            if (n > .5) {
+                pick = surprise;
+            }
+            else {
+                pick = contempt;
+            }
+        }
+    }
+    else {
+        if (d > .5) {
+            if (n > .5) {
+                pick = anger;
+            }
+            else {
+                pick = fear;
+            }
+        }
+        else {
+            if (n > .5) {
+                pick = distress;
+            }
+            else {
+                pick = shame;
+            }
+        }
+    }
+    assert(pick.isValid());
+    emojiComponent.setImage(pick);
 }
 
 void NeurotransmitterComponent::handleMessage(const Message &m)
 {
     Message *msg = const_cast<Message*>(&m);
     
+    bool needsRepaint = false;
+    
     Clara::SerotoninUpdateMessage* seroUpdate = dynamic_cast<Clara::SerotoninUpdateMessage*>(msg);
     if (seroUpdate != nullptr) {
         serotoninChart.addItem(seroUpdate->serotonin);
-        repaint();
+        needsRepaint = true;
     }
     Clara::DopamineUpdateMessage* dopaUpdate = dynamic_cast<Clara::DopamineUpdateMessage*>(msg);
     if (dopaUpdate != nullptr) {
         dopamineChart.addItem(dopaUpdate->dopamine);
-        repaint();
+        needsRepaint = true;
     }
     Clara::NoradrenalineUpdateMessage* noraUpdate = dynamic_cast<Clara::NoradrenalineUpdateMessage*>(msg);
     if (noraUpdate != nullptr) {
         noraldrenalineChart.addItem(noraUpdate->noradrelaine);
+        needsRepaint = true;
+    }
+    
+    if (needsRepaint) {
+        pickEmoji();
         repaint();
     }
 }

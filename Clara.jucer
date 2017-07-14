@@ -47,6 +47,15 @@
       <FILE id="h7JLf2" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
     <GROUP id="{68E37EFD-7462-583B-3F25-33DF07960960}" name="Resources">
+      <FILE id="vIzFPY" name="scared.png" compile="0" resource="1" file="Resources/scared.png"/>
+      <FILE id="nNy1Nw" name="anger.png" compile="0" resource="1" file="Resources/anger.png"/>
+      <FILE id="tO2JSJ" name="disgust.png" compile="0" resource="1" file="Resources/disgust.png"/>
+      <FILE id="BFW26o" name="distress.png" compile="0" resource="1" file="Resources/distress.png"/>
+      <FILE id="fbOn7g" name="excitement.png" compile="0" resource="1" file="Resources/excitement.png"/>
+      <FILE id="IObOjj" name="joy.png" compile="0" resource="1" file="Resources/joy.png"/>
+      <FILE id="zLLhtq" name="neutral.png" compile="0" resource="1" file="Resources/neutral.png"/>
+      <FILE id="CMTrAK" name="shame.png" compile="0" resource="1" file="Resources/shame.png"/>
+      <FILE id="tGvQvY" name="surprised.png" compile="0" resource="1" file="Resources/surprised.png"/>
       <FILE id="Bc5ynC" name="thecube.png" compile="0" resource="1" file="Resources/thecube.png"/>
     </GROUP>
   </MAINGROUP>
